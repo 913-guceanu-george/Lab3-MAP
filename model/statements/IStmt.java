@@ -1,4 +1,4 @@
-package statements;
+package model.statements;
 
 public interface IStmt {
     public String getType();

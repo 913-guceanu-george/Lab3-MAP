@@ -1,18 +1,21 @@
-package symbol;
+package model.symbol;
 
-public class SymBoolean implements ISymbol {
-    private Boolean value;
-    private String type;
+public class SymInteger implements ISymbol {
+    private Integer value;
     private String label;
+    private String type;
 
-    SymBoolean(Boolean val, String label) {
-        this.setType("bool");
+    SymInteger(Integer val, String label) {
+        this.setType("int");
         this.value = val;
         this.setLabel(label);
     }
 
-    @Override
-    public Boolean getValueBool() {
+    public void setValue(Integer val) {
+        this.value = val;
+    }
+
+    public Integer getValue() {
         return this.value;
     }
 
@@ -35,10 +38,4 @@ public class SymBoolean implements ISymbol {
     public String getLabel() {
         return this.label;
     }
-
-    @Override
-    public Integer getValueInt() {
-        return null;
-    }
-
 }

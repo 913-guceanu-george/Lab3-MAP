@@ -1,11 +1,11 @@
-package statements;
+package model.statements;
 
-public class VarDecl implements IStmt {
+public class IfStmt implements IStmt {
     private String type;
     private String contents;
 
-    VarDecl(String contents) {
-        this.type = "VarDecl";
+    public IfStmt(String contents) {
+        this.type = "IfStmt";
         this.contents = contents;
     }
 
@@ -16,7 +16,7 @@ public class VarDecl implements IStmt {
 
     @Override
     public String[] getWords() {
-        // Return model: "Type + name"
+        // Return model: "If" + exp1 + "Then" + exp2 + "Else" + exp3
         return this.contents.split(" ");
     }
 

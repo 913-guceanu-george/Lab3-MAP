@@ -1,4 +1,4 @@
-package symbol;
+package model.symbol;
 
 public interface ISymbol {
 
@@ -10,7 +10,4 @@ public interface ISymbol {
 
     public String getLabel();
 
-    public Boolean getValueBool();
-
-    public Integer getValueInt();
 }

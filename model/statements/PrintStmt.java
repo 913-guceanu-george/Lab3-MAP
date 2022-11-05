@@ -1,4 +1,4 @@
-package statements;
+package model.statements;
 
 public class PrintStmt implements IStmt {
     private String type;
