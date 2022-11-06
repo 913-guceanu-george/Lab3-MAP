@@ -1,0 +1,11 @@
+IStmt comp = this.stack.removeLast();
+        String st = ((CompStmt) comp).getStmt();
+        if (st.split(" ")[0] == "If") {
+            CompStmt nextComp = ((CompStmt) comp).nextCompStmt();
+            String st2 = nextComp.getStmt();
+            if (st2.split(" ")[0] == "Else") {
+                CompStmt finalComp = nextComp.nextCompStmt();
+                this.stack.addLast(finalComp);
+                
+            }
+        }

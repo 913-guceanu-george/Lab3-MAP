@@ -4,6 +4,10 @@ public class PrintStmt implements IStmt {
     private String type;
     private String contents;
 
+    public PrintStmt() {
+        this.type = "PrintStmt";
+    }
+
     @Override
     public String getType() {
         return this.type;

@@ -1,6 +1,6 @@
 package controller.exestack;
 
-import model.statements.*;
+import model.statements.IStmt;
 
 public class ExeStack implements IExeStack {
 
@@ -11,29 +11,27 @@ public class ExeStack implements IExeStack {
     }
 
     @Override
-    public void removeLast() {
-        IStmt comp = this.stack.getLast();
-        if (comp.getWords()[0] == "If") {
-            
-        }
+    public IStmt removeLast() {
+        return this.stack.removeLast();
     }
 
     @Override
-    public void removeFirst() {
-        // TODO Auto-generated method stub
+    public IStmt removeFirst() {
+        return this.stack.removeFirst();
 
     }
 
     @Override
     public void addLast(IStmt statement) {
-        // TODO Auto-generated method stub
-
+        this.stack.addLast(statement);
     }
 
     @Override
     public void addFirst(IStmt statement) {
-        // TODO Auto-generated method stub
-
+        this.stack.addFirst(statement);
     }
 
+    public int size() {
+        return this.stack.size();
+    }
 }
