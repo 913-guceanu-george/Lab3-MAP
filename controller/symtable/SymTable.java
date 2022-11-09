@@ -16,6 +16,12 @@ public class SymTable<Key, Value> implements ISymTable<Key, Value> {
         this.symbols.put(label, sym);
     }
 
+    @Override
+    public void setSymbol(Key label, Value sym) {
+        this.symbols.remove(label);
+        this.addSymbol(label, sym);
+    }
+
     // We'll need it to evaluate expressions
     @Override
     public Value getSymbol(Key label) {

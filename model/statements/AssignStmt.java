@@ -4,7 +4,7 @@ public class AssignStmt implements IStmt {
     private String type;
     private String contents;
 
-    AssignStmt(String contents) {
+    public AssignStmt(String contents) {
         this.type = "AssignStmt";
         this.contents = contents;
     }

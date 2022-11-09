@@ -4,7 +4,7 @@ public class VarDecl implements IStmt {
     private String type;
     private String contents;
 
-    VarDecl(String contents) {
+    public VarDecl(String contents) {
         this.type = "VarDecl";
         this.contents = contents;
     }

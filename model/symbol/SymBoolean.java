@@ -5,8 +5,8 @@ public class SymBoolean implements ISymbol {
     private String type;
     private String label;
 
-    SymBoolean(Boolean val,String label) {
-        this.setType("bool");
+    public SymBoolean(Boolean val, String label) {
+        this.setType("Bool");
         this.value = val;
         this.setLabel(label);
     }

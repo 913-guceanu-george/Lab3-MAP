@@ -9,3 +9,46 @@ IStmt comp = this.stack.removeLast();
                 
             }
         }
+
+
+
+
+
+
+// CompStmt comp = (CompStmt) this.stack.getLast();
+        // String stmt = comp.getStmt();
+        // AssignStmt assign = new AssignStmt(stmt);
+        // // Creating the next compound
+        // CompStmt next = comp.nextCompStmt();
+        // this.stack.removeLast();
+        // this.stack.addLast(next);
+        // // Getting some things we'll need
+        // String[] exp = assign.getWords(); // actual expression, separated
+        // ISymbol sym = Eval.lookUp(this.table, exp[0]);
+        // // Looking if the symbol exists
+        // if (sym != null) {
+        //     for (int i = 2; i < exp.length; i++) {
+        //         if (exp.length == 3) {
+        //             // Checking if it's just a simple assignment statement, doesn't involve other
+        //             // variables.
+        //             try {
+        //                 Integer val = Integer.parseInt(exp[2]);
+        //                 ((SymInteger) sym).setValue(val);
+        //                 this.table.setSymbol(sym.getLabel(), (SymInteger) sym);
+        //                 return assign;
+        //             }
+        //             // Checking if our symbol is assigned the value of another symbol
+        //             catch (NumberFormatException e) {
+        //                 ISymbol sym2 = Eval.lookUp(table, exp[2]);
+        //                 if (sym2 == null) {
+        //                     throw new SymbolException("Symbol with label" + exp[2] + "is not defined");
+        //                 }
+        //                 if (sym2.getType() != sym.getType()) {
+        //                     throw new TypeException("Symbols are not of same type.");
+        //                 }
+
+        //             }
+        //         }
+        //     }
+        // }
+        

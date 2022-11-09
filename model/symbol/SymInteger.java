@@ -5,8 +5,8 @@ public class SymInteger implements ISymbol {
     private String label;
     private String type;
 
-    SymInteger(Integer val, String label) {
-        this.setType("int");
+    public SymInteger(Integer val, String label) {
+        this.setType("Int");
         this.value = val;
         this.setLabel(label);
     }
