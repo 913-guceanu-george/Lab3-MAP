@@ -8,13 +8,13 @@ import model.statements.*;
 
 public interface IProgramState {
 
-    public AssignStmt processAssign() throws SymbolException, TypeException, DivisionByZero;
+    public void nextIsAssign() throws SymbolException, TypeException, DivisionByZero;
 
-    public IfStmt processIf();
+    public IfStmt nextIsIf() throws SymbolException, TypeException, DivisionByZero;
 
-    public PrintStmt processPrint();
+    public PrintStmt processPrint() throws SymbolException, TypeException, DivisionByZero;
 
-    public VarDecl processDecl();
+    public void nextIsDecl() throws SymbolException;
 
-    public void nextStep();
+    public void nextStep() throws SymbolException, TypeException, DivisionByZero;
 }

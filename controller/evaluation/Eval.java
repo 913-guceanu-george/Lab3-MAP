@@ -1,5 +1,6 @@
 package controller.evaluation;
 
+import controller.exestack.MyDeque;
 import controller.symtable.SymTable;
 import exceptions.DivisionByZero;
 import exceptions.SymbolException;
@@ -9,13 +10,9 @@ import model.symbol.*;
 
 public class Eval {
 
-    public static ISymbol lookUp(SymTable<String, ISymbol> table, String label) throws SymbolException {
-        ISymbol symbol = table.getSymbol(label);
-        if (symbol == null) {
-            throw new SymbolException("Symbol is not in table");
-        }
-        return symbol;
-
+    public static ISymbol lookUp(SymTable<String, ISymbol> table, String label) {
+        // Null if it can't find one or the sym.
+        return table.getSymbol(label);
     }
 
     // Evaluating the Integer symbols
@@ -75,10 +72,7 @@ public class Eval {
         return b;
     }
 
-    /**
-     * @param statement
-     * @return false if the stmt is not compound or is an empty compound.
-     */
+    // We need them to shorten exec time
     public static boolean isCompStmt(IStmt statement) {
         if (statement.getType() == "CompStmt") {
             if (((CompStmt) statement).getWords()[0] == "")
@@ -125,6 +119,7 @@ public class Eval {
         return false;
     }
 
+    // They eval expressions, no matter the terms
     public static Integer evalArithemtic(ISymbol sym1, ISymbol sym2, String operator)
             throws DivisionByZero, TypeException {
         if (sym1.getType() == "Int") {
@@ -168,5 +163,165 @@ public class Eval {
         }
         throw new TypeException("Operands are not of same type");
 
+    }
+
+    public static AssignStmt processAssign(SymTable<String, ISymbol> table, IStmt stmt)
+            throws TypeException, SymbolException, DivisionByZero {
+        if (Eval.isAssignStmt(stmt)) { // First we check if it's an assign statement
+            try {
+                String[] exp = ((AssignStmt) stmt).getWords();
+                ISymbol sym = Eval.lookUp(table, exp[0]); // We get the symbol, lookUp automatically checks if it's in
+                                                          // the table
+                if (Eval.isInt(sym)) { // If our symbol is an integer
+                    Integer rez = 0;
+                    if (exp.length == 3) { // If it's just a simple assignment
+                        rez = Eval.isNumeric(exp[2]);
+                        if (rez != null) { // Checking if we are assigning a variable only a value
+                            table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
+                            return (AssignStmt) stmt;
+                        } else { // If it's not a value, than it is the value of another variable
+                            rez = ((SymInteger) Eval.lookUp(table, exp[2])).getValue();
+                            table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
+                            return (AssignStmt) stmt;
+                        }
+                    } else { // If it's a compund assingment
+                        // First value of the assignment
+                        rez = Eval.isNumeric(exp[2]);
+                        if (rez == null)
+                            rez = ((SymInteger) Eval.lookUp(table, exp[2])).getValue();
+                        // Rest of the values
+                        for (int i = 3; i < exp.length - 1; i = i + 2) {
+                            ISymbol s2 = Eval.lookUp(table, exp[i + 1]);
+                            if (s2 != null) {
+                                rez += Eval.evalArithemtic(new SymInteger(rez, ""), s2, exp[i]);
+                            } else {
+                                rez += Eval.evalArithemtic(new SymInteger(rez, ""),
+                                        new SymInteger(Eval.isNumeric(exp[i + 1]), ""), exp[i]);
+                            }
+                        }
+                        table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
+                        return (AssignStmt) stmt;
+
+                    }
+                }
+                // Analog for the boolean value
+                if (Eval.isBool(sym)) {
+                    Boolean rez = null;
+                    if (exp.length == 3) {
+                        rez = Eval.isBoolean(exp[2]);
+                        if (rez != null) {
+                            table.setSymbol(sym.getLabel(), new SymBoolean(rez, sym.getLabel()));
+                            return (AssignStmt) stmt;
+                        } else {
+                            rez = ((SymBoolean) Eval.lookUp(table, exp[2])).getValue();
+                            table.setSymbol(sym.getLabel(), new SymBoolean(rez, sym.getLabel()));
+                            return (AssignStmt) stmt;
+                        }
+                    } else {
+                        rez = Eval.isBoolean(exp[2]);
+                        if (rez == null)
+                            rez = ((SymBoolean) Eval.lookUp(table, exp[2])).getValue();
+                        for (int i = 3; i < exp.length - 1; i = i + 2) {
+                            ISymbol s2 = Eval.lookUp(table, exp[i + 1]);
+                            if (s2 != null) {
+                                rez = Eval.evalLogical(new SymBoolean(rez, ""), s2, exp[i]);
+                            } else {
+                                rez = Eval.evalLogical(new SymBoolean(rez, ""),
+                                        new SymBoolean(Eval.isBoolean(exp[i + 1]), ""), exp[i]);
+                            }
+                        }
+                        table.setSymbol(sym.getLabel(), new SymBoolean(rez, sym.getLabel()));
+                        return (AssignStmt) stmt;
+                    }
+                }
+            } catch (SymbolException e) {
+                throw new SymbolException(e.getMessage());
+            } catch (DivisionByZero d) {
+                throw new DivisionByZero(d.getMessage());
+            } catch (TypeException t) {
+                throw new TypeException(t.getMessage());
+            }
+        }
+        return (AssignStmt) null;
+    }
+
+    public static VarDecl processDecl(SymTable<String, ISymbol> table, IStmt v) throws SymbolException {
+        String[] exp = ((VarDecl) v).getWords();
+        if (Eval.isVarDecl(v)) {
+            if (exp[0] == "Int") {
+                SymInteger s = new SymInteger(null, exp[1]);
+                if (Eval.lookUp(table, exp[1]) == null) {
+                    table.addSymbol(s.getLabel(), s);
+                    return (VarDecl) v;
+                }
+                throw new SymbolException("Variable: " + s.getLabel() + " cannot be added twice.");
+            }
+            if (exp[0] == "Bool") {
+                SymBoolean s = new SymBoolean(null, exp[1]);
+                if (Eval.lookUp(table, exp[1]) == null) {
+                    table.addSymbol(s.getLabel(), s);
+                    return (VarDecl) v;
+                }
+                throw new SymbolException("Variable: " + s.getLabel() + " cannot be added twice.");
+            }
+            throw new SymbolException("Syntax error!");
+        }
+        return (VarDecl) null;
+    }
+
+    public static PrintStmt processPrint(MyDeque<String> output, SymTable<String, ISymbol> table, IStmt v)
+            throws SymbolException {
+        if (Eval.isPrintStmt(v)) {
+            try {
+                String[] exp = ((PrintStmt) v).getWords();
+                if (exp[0] == "\"") {
+                    output.add(((PrintStmt) v).getWords()[0].split("\"")[0]);
+                    return (PrintStmt) v;
+                }
+                String label = exp[0].split(")")[0];
+                ISymbol sym = Eval.lookUp(table, label);
+                if (sym == null) {
+                    throw new SymbolException("Variable is not declared.");
+                }
+                if (sym.getType() == "Int") {
+                    output.add(Integer.toString(((SymInteger) sym).getValue()));
+                    return (PrintStmt) v;
+                }
+                if (sym.getType() == "Bool") {
+                    output.add(Boolean.toString(((SymBoolean) sym).getValue()));
+                    return (PrintStmt) v;
+                }
+
+            } catch (SymbolException s) {
+                throw new SymbolException(s.getMessage());
+            }
+        }
+        return (PrintStmt) null;
+    }
+
+    public static IfStmt processConditional(SymTable<String, ISymbol> table, IStmt conditional) {
+        // TODO - finish all the other statements before this one.
+        if (Eval.isIfStmt(conditional)) {
+            try {
+                String[] exp = conditional.getWords(); // Splitting into expressions
+
+                String[] firstExp = exp[1].split(" ");
+                if (firstExp.length == 1) { // First case, it has only a variable
+                    Integer a = Eval.isNumeric(firstExp[0]);
+                    ISymbol sym = Eval.lookUp(table, firstExp[0]);
+                    if (sym == null && a == null) {
+                        throw new SymbolException("Condition cannot be evaluated");
+                    }
+                    if (sym.getType() == "Int") {
+                        if (((SymInteger) sym).getValue() != 0 || (a != null && a != 0)) { // Evaluating it as true
+
+                        }
+                    }
+                }
+            } catch (SymbolException e) {
+                // throw new SymbolException(e.getMessage());
+            }
+        }
+        return (IfStmt) null;
     }
 }

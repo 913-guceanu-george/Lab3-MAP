@@ -1,5 +1,8 @@
 package controller.progstate;
 
+import javax.xml.catalog.Catalog;
+import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
+
 import controller.evaluation.Eval;
 import controller.exestack.ExeStack;
 import controller.exestack.MyDeque;
@@ -7,11 +10,10 @@ import controller.symtable.SymTable;
 import exceptions.*;
 import model.statements.*;
 import model.symbol.ISymbol;
+import model.symbol.SymBoolean;
 import model.symbol.SymInteger;
 
 public class ProgramState implements IProgramState {
-
-    // TODO - analyze all cases for each Statement
 
     private SymTable<String, ISymbol> table;
     private ExeStack stack;
@@ -25,68 +27,75 @@ public class ProgramState implements IProgramState {
     }
 
     @Override
-    public AssignStmt processAssign() throws SymbolException, TypeException, DivisionByZero {
-        CompStmt comp = (CompStmt) this.stack.removeLast();
+    public void nextIsAssign() throws SymbolException, TypeException, DivisionByZero {
+        CompStmt comp = (CompStmt) this.stack.getLast();
         String assignContent = comp.getStmt();
-        comp = comp.nextCompStmt();
-        this.stack.addLast(comp);
-        AssignStmt stmt = new AssignStmt(assignContent);
-        this.stack.addFirst(stmt);
-        String[] exp = stmt.getWords();
-        if (Eval.isAssignStmt(stmt)) { // First we check if it's an assign statement
-            try {
-                ISymbol sym = Eval.lookUp(table, exp[0]); // We get the symbol, lookUp automatically checks if it's in
-                                                          // the table
-                if (Eval.isInt(sym)) { // If our symbol is an integer
-                    Integer rez = 0;
-                    if (exp.length == 3) { // If it's just a simple assignment
-                        rez = Eval.isNumeric(exp[2]);
-                        if (rez != null) { // Checking if we are assigning a variable only a value
-                            this.table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
-                            return stmt;
-                        } else { // If it's not a value, than it is the value of another variable
-                            rez = ((SymInteger) Eval.lookUp(table, exp[2])).getValue();
-                            this.table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
-                            return stmt;
-                        }
-                    } else { // If it's a compund assingment
-                        // First value of the assignment
-                        rez = Eval.isNumeric(exp[2]);
-                        if (rez == null)
-                            rez = ((SymInteger) Eval.lookUp(table, exp[2])).getValue();
-                        // Rest of the values
-                        for (int i = 3; i < exp.length - 1; i = i + 2) {
-                            ISymbol s2 = Eval.lookUp(table, exp[i + 1]);
-                            if (s2 != null) {
-                                rez += Eval.evalArithemtic(new SymInteger(rez, ""), s2, exp[i]);
-                            } else {
-                                rez += Eval.evalArithemtic(new SymInteger(rez, ""),
-                                        new SymInteger(Eval.isNumeric(exp[i + 1]), ""), exp[i]);
-                            }
-                        }
-                        this.table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
-                        return stmt;
+        try {
+            CompStmt nexCompStmt = comp.nextCompStmt();
+            AssignStmt stmt = new AssignStmt(assignContent);
+            AssignStmt astmt = Eval.processAssign(table, stmt);
+            if (astmt == null)
+                return;
+            this.stack.removeLast();
+            this.stack.addLast(nexCompStmt);
+            this.stack.addFirst(astmt);
+        } catch (SymbolException s) {
+            throw new SymbolException(s.getMessage());
+        } catch (TypeException t) {
+            throw new TypeException(t.getMessage());
+        } catch (DivisionByZero d) {
+            throw new DivisionByZero(d.getMessage());
+        }
+    }
 
+    @Override
+    public void nextIsDecl() throws SymbolException {
+        CompStmt comp = (CompStmt) this.stack.getLast();
+        String declContent = comp.getStmt();
+        try {
+            VarDecl v = new VarDecl(declContent);
+            VarDecl dstmt = Eval.processDecl(table, v);
+            if (dstmt == null)
+                return;
+            this.stack.removeLast();
+            this.stack.addLast(comp.nextCompStmt());
+            this.stack.addFirst(v);
+        } catch (SymbolException s) {
+            throw new SymbolException(s.getMessage());
+        }
+    }
+
+    @Override
+    public IfStmt nextIsIf() throws SymbolException, TypeException, DivisionByZero {
+        // TODO - Do a conditional evaluation in Eval
+        CompStmt comp = (CompStmt) this.stack.removeLast();
+        String condContent = comp.getStmt();
+        this.stack.addLast(comp.nextCompStmt());
+        IfStmt conditional = new IfStmt(condContent);
+        this.stack.addFirst(conditional);
+        String[] exp = conditional.getWords();
+        if (Eval.isIfStmt(conditional)) {
+            if (exp.length == 4) {
+                try {
+                    // Second string from the exp will be our condition, which will be a variable
+                    // and we have to evaluate it
+                    ISymbol sym = Eval.lookUp(table, exp[1]);
+                    if (Eval.isBool(sym)) {
+                        // We'll now look at realistic use cases for the conditional stmt
+                        // First one we check is assign stmt
+                        if (Eval.isAssignStmt(new AssignStmt(exp[3]))) {
+
+                        }
                     }
+                } catch (SymbolException s) {
+                    throw new SymbolException(s.getMessage());
+                } catch (TypeException t) {
+                    throw new TypeException(t.getMessage());
+                } catch (DivisionByZero d) {
+                    throw new DivisionByZero(d.getMessage());
                 }
-            } catch (SymbolException e) {
-                throw new SymbolException(e.getMessage());
-            } catch (DivisionByZero d) {
-                throw new DivisionByZero(d.getMessage());
-            } catch (TypeException t) {
-                throw new TypeException(t.getMessage());
             }
         }
-        return (AssignStmt) null;
-    }
-
-    @Override
-    public VarDecl processDecl() {
-        return (VarDecl) null;
-    }
-
-    @Override
-    public IfStmt processIf() {
         return (IfStmt) null;
     }
 
