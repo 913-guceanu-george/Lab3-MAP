@@ -26,12 +26,21 @@ public class CompStmt implements IStmt {
         return this.contents.split(";")[0];
     }
 
-    public CompStmt nextCompStmt() {
+    public IStmt nextCompStmt() {
         String[] all = this.getWords();
         String rest = "";
         for (int i = 1; i < all.length; i++) {
             rest += all[i] + ";";
         }
-        return new CompStmt(rest);
+        if (rest != "") {
+            return new CompStmt(rest);
+        }
+        return new NOP();
+    }
+
+    @Override
+    public String getContents() {
+
+        return this.contents;
     }
 }

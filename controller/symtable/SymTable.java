@@ -34,4 +34,15 @@ public class SymTable<Key, Value> implements ISymTable<Key, Value> {
         return this.symbols;
     }
 
+    @Override
+    public String toString() {
+        String rez = "";
+        if (symbols.size() == 0) {
+            return "";
+        }
+        for (Key k : this.symbols.keySet()) {
+            rez += k.toString() + " " + this.getSymbol(k).toString() + "| ";
+        }
+        return rez;
+    }
 }

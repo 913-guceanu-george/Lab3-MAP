@@ -20,4 +20,9 @@ public class VarDecl implements IStmt {
         return this.contents.split(" ");
     }
 
+    @Override
+    public String getContents() {
+        return this.contents;
+    }
+
 }

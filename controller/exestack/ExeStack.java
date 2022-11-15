@@ -38,4 +38,19 @@ public class ExeStack implements IExeStack {
     public int size() {
         return this.stack.size();
     }
+
+    @Override
+    public String toString() {
+        String rez = "";
+        if (this.stack.size() == 0) {
+            return "";
+        }
+        for (int i = 0; i < this.stack.size(); i++) {
+            rez += this.stack.get(i).getContents() + "| ";
+        }
+        // for (IStmt stmt : this.stack) {
+        // rez += stmt.getContents() + "| ";
+        // }
+        return rez;
+    }
 }

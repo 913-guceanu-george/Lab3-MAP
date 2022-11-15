@@ -62,6 +62,10 @@ public class MyDeque<Value> implements Deque<Value> {
         return this.elems.get(0);
     }
 
+    public Value get(int index) {
+        return this.elems.get(index);
+    }
+
     @Override
     public Value getLast() {
         return this.elems.get(this.elems.size() - 1);

@@ -17,4 +17,9 @@ public class AssignStmt implements IStmt {
         // Return model: Name + "=" + value
         return this.contents.split(" ");
     }
+
+    @Override
+    public String getContents() {
+        return this.contents;
+    }
 }
