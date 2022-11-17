@@ -4,7 +4,10 @@ import controller.evaluation.Eval;
 import controller.exestack.ExeStack;
 import controller.exestack.MyDeque;
 import controller.symtable.SymTable;
-import exceptions.*;
+import exceptions.DivisionByZero;
+import exceptions.StmtException;
+import exceptions.SymbolException;
+import exceptions.TypeException;
 import model.statements.*;
 import model.symbol.ISymbol;
 
@@ -35,7 +38,8 @@ public class ProgramState implements IProgramState {
 
     @Override
     public void nextIsAssign() throws SymbolException, TypeException, DivisionByZero {
-        CompStmt comp = (CompStmt) this.stack.getLast();
+        CompStmt comp;
+        comp = (CompStmt) this.stack.getLast();
         String assignContent = comp.getStmt();
         try {
             // IStmt nexCompStmt = ((CompStmt) comp).nextCompStmt();
@@ -121,10 +125,10 @@ public class ProgramState implements IProgramState {
             System.exit(0);
         }
         try {
+            this.nextIsIf();
             this.nextIsAssign();
             this.nextIsDecl();
             this.nextIsPrint();
-            this.nextIsIf();
         } catch (SymbolException s) {
             throw new SymbolException(s.getMessage());
         } catch (TypeException t) {
