@@ -24,7 +24,7 @@ public class NOP implements IStmt {
 
     @Override
     public String getContents() {
-        return null;
+        return this.contents;
     }
 
 }

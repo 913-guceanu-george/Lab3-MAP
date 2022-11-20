@@ -30,8 +30,8 @@ public class View implements IView {
         if (output.size() == 0) {
             outputStr = "";
         } else
-            for (String s : output) {
-                outputStr += s + "| ";
+            for (int i = 0; i < output.size(); i++) {
+                outputStr += output.get(i) + "| ";
             }
         System.out.println("Table: " + tableStr);
         System.out.println("Stack: " + stackStr);
