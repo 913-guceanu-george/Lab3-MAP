@@ -6,9 +6,9 @@ public interface IProgramState {
 
     public void nextIsAssign() throws SymbolException, TypeException, DivisionByZero;
 
-    public void nextIsIf() throws SymbolException, TypeException, DivisionByZero, StmtException;
+    public String nextIsIf() throws SymbolException, TypeException, DivisionByZero, StmtException;
 
-    public void nextIsPrint() throws SymbolException, TypeException, DivisionByZero;
+    public String nextIsPrint() throws SymbolException, TypeException, DivisionByZero;
 
     public void nextIsDecl() throws SymbolException;
 

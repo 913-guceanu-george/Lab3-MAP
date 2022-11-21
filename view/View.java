@@ -43,7 +43,15 @@ public class View implements IView {
     public void execute() {
         try {
             while (true) {
+                if (this.progState.getStack().getLast().getType() == "NOP") {
+                    System.exit(0);
+                }
+                String prev = this.progState.getOutput().getLast();
                 this.progState.nextStep();
+                String toPrint = this.progState.print(prev);
+                if (toPrint != null) {
+                    System.out.println(toPrint);
+                }
                 this.displayProgState();
             }
         } catch (SymbolException s) {

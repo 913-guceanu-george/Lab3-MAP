@@ -41,7 +41,10 @@ public class SymBoolean implements ISymbol {
 
     @Override
     public String toString() {
-        return this.value.toString();
+        if (this.value == null) {
+            return "No value assigned";
+        }
+        return this.type + ": " + this.value.toString();
     }
 
 }

@@ -36,6 +36,14 @@ public class ProgramState implements IProgramState {
         return this.output;
     }
 
+    public String print(String prev) {
+        String lastOut = this.output.getLast();
+        if (lastOut != null && lastOut != prev) {
+            return lastOut;
+        }
+        return null;
+    }
+
     @Override
     public void nextIsAssign() throws SymbolException, TypeException, DivisionByZero {
         CompStmt comp;
@@ -57,6 +65,7 @@ public class ProgramState implements IProgramState {
         } catch (DivisionByZero d) {
             throw new DivisionByZero(d.getMessage());
         }
+
     }
 
     @Override
@@ -71,24 +80,28 @@ public class ProgramState implements IProgramState {
             this.stack.removeLast();
             this.stack.addLast(comp.nextCompStmt());
             this.stack.addFirst(v);
+
         } catch (SymbolException s) {
             throw new SymbolException(s.getMessage());
         }
     }
 
     @Override
-    public void nextIsIf() throws SymbolException, TypeException, DivisionByZero, StmtException {
+    public String nextIsIf() throws SymbolException, TypeException, DivisionByZero, StmtException {
+
         CompStmt comp = (CompStmt) this.stack.getLast();
         String condContent = comp.getStmt();
         try {
             IfStmt conditional = new IfStmt(condContent);
             IfStmt cond = Eval.processConditional(stack, output, table, conditional);
+            String prev = this.output.getFirst();
             if (cond == null) {
-                return;
+                return null;
             }
             this.stack.removeLast();
             this.stack.addLast(comp.nextCompStmt());
             this.stack.addFirst(cond);
+            return this.print(prev);
         } catch (SymbolException s) {
             throw new SymbolException(s.getMessage());
         } catch (TypeException t) {
@@ -98,21 +111,24 @@ public class ProgramState implements IProgramState {
         } catch (StmtException st) {
             throw new StmtException(st.getMessage());
         }
+
     }
 
     @Override
-    public void nextIsPrint() throws SymbolException {
+    public String nextIsPrint() throws SymbolException {
         CompStmt comp = (CompStmt) this.stack.getLast();
         String printContent = comp.getStmt();
         try {
             PrintStmt print = new PrintStmt(printContent);
             PrintStmt check = Eval.processPrint(output, table, print);
             if (check == null) {
-                return;
+                return null;
             }
             this.stack.removeLast();
             this.stack.addLast(comp.nextCompStmt());
             this.stack.addFirst(check);
+            String prev = this.output.getFirst();
+            return this.print(prev);
         } catch (SymbolException s) {
             throw new SymbolException(s.getMessage());
         }

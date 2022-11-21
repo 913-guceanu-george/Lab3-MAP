@@ -59,6 +59,9 @@ public class MyDeque<Value> implements Deque<Value> {
 
     @Override
     public Value getFirst() {
+        if (this.size() == 0) {
+            return null;
+        }
         return this.elems.get(0);
     }
 
@@ -68,6 +71,9 @@ public class MyDeque<Value> implements Deque<Value> {
 
     @Override
     public Value getLast() {
+        if (this.elems.size() == 0) {
+            return null;
+        }
         return this.elems.get(this.elems.size() - 1);
     }
 

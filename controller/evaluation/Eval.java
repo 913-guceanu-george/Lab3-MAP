@@ -289,10 +289,9 @@ public class Eval {
                 if (exp[1].startsWith("\"")) {
                     String rez = ((PrintStmt) v).getWords()[1].split("\"")[1];
                     output.addLast(rez);
-                    System.out.println(output.getLast());
                     return (PrintStmt) v;
                 }
-                String label = exp[0].split(")")[0];
+                String label = exp[1].split("\\)")[0];
                 ISymbol sym = Eval.lookUp(table, label);
                 if (sym == null) {
                     throw new SymbolException("Variable is not declared.");
