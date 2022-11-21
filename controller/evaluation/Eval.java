@@ -83,7 +83,8 @@ public class Eval {
     }
 
     public static boolean isAssignStmt(IStmt statement) {
-        if (statement.getWords()[1] == "=") {
+        String tok = ((AssignStmt) statement).getWords()[1];
+        if (tok.startsWith("=")) {
             return true;
         }
         return false;
@@ -99,7 +100,8 @@ public class Eval {
     }
 
     public static boolean isVarDecl(IStmt statement) {
-        if (statement.getWords()[0] == "Int" || statement.getWords()[0] == "Bool") {
+        if (((VarDecl) statement).getWords()[0].startsWith("Int")
+                || ((VarDecl) statement).getWords()[0].startsWith("Bool")) {
             return true;
 
         }
@@ -258,7 +260,7 @@ public class Eval {
     public static VarDecl processDecl(SymTable<String, ISymbol> table, IStmt v) throws SymbolException {
         String[] exp = ((VarDecl) v).getWords();
         if (Eval.isVarDecl(v)) {
-            if (exp[0] == "Int") {
+            if (exp[0].startsWith("Int")) {
                 SymInteger s = new SymInteger(null, exp[1]);
                 if (Eval.lookUp(table, exp[1]) == null) {
                     table.addSymbol(s.getLabel(), s);
@@ -266,7 +268,7 @@ public class Eval {
                 }
                 throw new SymbolException("Variable: " + s.getLabel() + " cannot be added twice.");
             }
-            if (exp[0] == "Bool") {
+            if (exp[0].startsWith("Bool")) {
                 SymBoolean s = new SymBoolean(null, exp[1]);
                 if (Eval.lookUp(table, exp[1]) == null) {
                     table.addSymbol(s.getLabel(), s);

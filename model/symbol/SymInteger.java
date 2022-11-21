@@ -38,4 +38,9 @@ public class SymInteger implements ISymbol {
     public String getLabel() {
         return this.label;
     }
+
+    @Override
+    public String toString() {
+        return this.value.toString();
+    }
 }

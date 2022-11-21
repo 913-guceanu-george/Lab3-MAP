@@ -39,4 +39,9 @@ public class SymBoolean implements ISymbol {
         return this.label;
     }
 
+    @Override
+    public String toString() {
+        return this.value.toString();
+    }
+
 }
