@@ -1,28 +1,21 @@
 package model.symbol;
 
-public class SymInteger implements ISymbol {
-    private Integer value;
+public class SymString implements ISymbol {
+
     private String label;
+    private String value;
     private String type;
 
-    public SymInteger(Integer val, String label) {
-        this.setType("Int");
-        this.value = val;
+    public SymString(String label, String value) {
+        this.setType("String");
         this.setLabel(label);
+        this.value = new String(value);
     }
 
-    public SymInteger(String label) {
+    public SymString(String label) {
+        this.setType("String");
         this.defaultValue();
         this.setLabel(label);
-        this.setType("Int");
-    }
-
-    public void setValue(Integer val) {
-        this.value = val;
-    }
-
-    public Integer getValue() {
-        return this.value;
     }
 
     @Override
@@ -45,12 +38,12 @@ public class SymInteger implements ISymbol {
         return this.label;
     }
 
-    @Override
-    public String toString() {
-        if (this.value == null) {
-            return "No value assigned";
-        }
-        return this.type + ": " + this.value.toString();
+    public void setValue(String value) {
+        this.value = new String(value);
+    }
+
+    public String getValue() {
+        return this.value;
     }
 
     @Override

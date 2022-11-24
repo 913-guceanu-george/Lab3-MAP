@@ -59,9 +59,16 @@ public class IfStmt implements IStmt {
         // Computing the third one, if it exists
         i++;
         String thirdExp = "";
-        while (i < exp.length - 1) {
-            thirdExp += exp[i] + " ";
+        for (int k = i + 1; k < exp.length - 1; k++) {
+            if (exp[k + 1].endsWith(";")) {
+                thirdExp += exp[k] + " ";
+                thirdExp += exp[k + 1].split(";")[0];
+                k++;
+                break;
+            }
+            thirdExp += exp[k] + " ";
         }
+        
         String[] finalExp = new String[6];
         finalExp[0] = "If";
         finalExp[1] = firstExp;

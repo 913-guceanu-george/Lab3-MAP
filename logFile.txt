@@ -1,0 +1,63 @@
+Execution no. 1
+Int b
+b = 2 + 3; Int c; c = 2; b = 3 * c; Bool bol; bol = false and true; Print(bol); Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
+
+Execution no. 2
+Int c
+b = 2 + 3
+Int b
+c = 2; b = 3 * c; Bool bol; bol = false and true; Print(bol); Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
+
+Execution no. 3
+c = 2
+Int c
+b = 2 + 3
+Int b
+b = 3 * c; Bool bol; bol = false and true; Print(bol); Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
+
+Execution no. 4
+Bool bol
+b = 3 * c
+c = 2
+Int c
+b = 2 + 3
+Int b
+bol = false and true; Print(bol); Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
+
+Execution no. 5
+Print(bol)
+bol = false and true
+Bool bol
+b = 3 * c
+c = 2
+Int c
+b = 2 + 3
+Int b
+Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
+
+Execution no. 6
+Print("Condition not met")
+Print(bol)
+bol = false and true
+Bool bol
+b = 3 * c
+c = 2
+Int c
+b = 2 + 3
+Int b
+If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
+
+Execution no. 7
+If bol Then Print("In fiecare zi vad garda") Else b = 1;
+b = 1
+Print("Condition not met")
+Print(bol)
+bol = false and true
+Bool bol
+b = 3 * c
+c = 2
+Int c
+b = 2 + 3
+Int b
+
+

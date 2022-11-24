@@ -5,9 +5,11 @@ import controller.exestack.MyDeque;
 import controller.progstate.ProgramState;
 import controller.symtable.SymTable;
 import exceptions.DivisionByZero;
+import exceptions.FileException;
 import exceptions.StmtException;
 import exceptions.SymbolException;
 import exceptions.TypeException;
+import model.statements.IStmt;
 import model.symbol.ISymbol;
 
 public class View implements IView {
@@ -42,17 +44,51 @@ public class View implements IView {
     @Override
     public void execute() {
         try {
+            IStmt last;
+            Integer exec_no = 1;
             while (true) {
-                if (this.progState.getStack().getLast().getType() == "NOP") {
+                //
+                last = this.progState.getStack().getLast();
+                if (last.getType() == "NOP") {
+                    this.displayProgState();
+                    this.progState.logProgramStateExec(exec_no);
                     System.exit(0);
                 }
-                String prev = this.progState.getOutput().getLast();
-                this.progState.nextStep();
-                String toPrint = this.progState.print(prev);
-                if (toPrint != null) {
-                    System.out.println(toPrint);
+                this.progState.nextIsIf();
+                //
+                last = this.progState.getStack().getLast();
+                if (last.getType() == "NOP") {
+                    this.displayProgState();
+                    this.progState.logProgramStateExec(exec_no);
+                    System.exit(0);
                 }
+                this.progState.nextIsAssign();
+                //
+                last = this.progState.getStack().getLast();
+                if (last.getType() == "NOP") {
+                    this.displayProgState();
+                    this.progState.logProgramStateExec(exec_no);
+                    System.exit(0);
+                }
+                this.progState.nextIsDecl();
+                //
+                last = this.progState.getStack().getLast();
+                if (last.getType() == "NOP") {
+                    this.displayProgState();
+                    this.progState.logProgramStateExec(exec_no);
+                    System.exit(0);
+                }
+                this.progState.nextIsPrint();
+                last = this.progState.getStack().getLast();
+                if (last.getType() == "NOP") {
+                    this.displayProgState();
+                    this.progState.logProgramStateExec(exec_no);
+                    System.exit(0);
+                }
+                // this.progState.nextStep();
                 this.displayProgState();
+                this.progState.logProgramStateExec(exec_no);
+                exec_no++;
             }
         } catch (SymbolException s) {
             System.out.println(s.getMessage());
@@ -62,6 +98,8 @@ public class View implements IView {
             System.out.println(d.getMessage());
         } catch (StmtException st) {
             System.out.println(st.getMessage());
+        } catch (FileException f) {
+            System.out.println(f.getMessage());
         }
     }
 

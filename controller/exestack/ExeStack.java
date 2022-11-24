@@ -31,6 +31,11 @@ public class ExeStack implements IExeStack {
         this.stack.addFirst(statement);
     }
 
+    @Override
+    public IStmt getElem(int index) {
+        return this.stack.get(index);
+    }
+
     public IStmt getLast() {
         return this.stack.getLast();
     }

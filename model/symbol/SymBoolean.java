@@ -11,6 +11,12 @@ public class SymBoolean implements ISymbol {
         this.setLabel(label);
     }
 
+    public SymBoolean(String label) {
+        this.defaultValue();
+        this.setType("Bool");
+        this.setLabel(label);
+    }
+
     public void setValue(Boolean val) {
         this.value = val;
     }
@@ -45,6 +51,11 @@ public class SymBoolean implements ISymbol {
             return "No value assigned";
         }
         return this.type + ": " + this.value.toString();
+    }
+
+    @Override
+    public void defaultValue() {
+        this.setValue(null);
     }
 
 }

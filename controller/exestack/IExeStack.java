@@ -10,4 +10,6 @@ public interface IExeStack {
     public void addLast(IStmt statement);
 
     public void addFirst(IStmt statement);
+
+    public IStmt getElem(int index);
 }

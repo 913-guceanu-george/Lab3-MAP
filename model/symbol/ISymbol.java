@@ -10,4 +10,6 @@ public interface ISymbol {
 
     public String getLabel();
 
+    public void defaultValue();
+
 }

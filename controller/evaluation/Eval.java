@@ -111,20 +111,20 @@ public class Eval {
     // They eval expressions, no matter the terms
     public static Integer evalArithemtic(ISymbol sym1, ISymbol sym2, String operator)
             throws DivisionByZero, TypeException {
-        if (sym1.getType() == "Int") {
-            if (sym2.getType() == "Int") {
+        if (((SymInteger) sym1).getType() == "Int") {
+            if (((SymInteger) sym2).getType() == "Int") {
                 Integer nr1 = ((SymInteger) sym1).getValue();
                 Integer nr2 = ((SymInteger) sym2).getValue();
-                if (operator == "+") {
+                if (operator.startsWith("+")) {
                     return nr1 + nr2;
                 }
-                if (operator == "*") {
+                if (operator.startsWith("*")) {
                     return nr1 * nr2;
                 }
-                if (operator == "-") {
+                if (operator.startsWith("-")) {
                     return nr1 - nr2;
                 }
-                if (operator == "/") {
+                if (operator.startsWith("/")) {
                     if (nr2 != 0) {
                         return nr1 / nr2;
                     }
@@ -141,10 +141,10 @@ public class Eval {
             if (sym2.getType() == "Bool") {
                 Boolean s1 = ((SymBoolean) sym1).getValue();
                 Boolean s2 = ((SymBoolean) sym2).getValue();
-                if (operator == "and") {
+                if (operator.startsWith("and")) {
                     return s1 && s2;
                 }
-                if (operator == "or") {
+                if (operator.startsWith("or")) {
                     return s1 || s2;
                 }
             }
@@ -154,6 +154,15 @@ public class Eval {
 
     }
 
+    /**
+     * @param table
+     * @param stmt
+     * @return returns the statement if it is of the type it's processing, null
+     *         otherwise
+     * @throws TypeException
+     * @throws SymbolException
+     * @throws DivisionByZero
+     */
     public static AssignStmt processAssign(SymTable<String, ISymbol> table, IStmt stmt)
             throws TypeException, SymbolException, DivisionByZero {
         if (Eval.isAssignStmt(stmt)) { // First we check if it's an assign statement
@@ -197,8 +206,9 @@ public class Eval {
                                 if (perm == null) {
                                     throw new SymbolException("Variable is not declared.");
                                 }
-                                rez += Eval.evalArithemtic(new SymInteger(rez, ""),
+                                Integer aux = Eval.evalArithemtic(new SymInteger(0, ""),
                                         new SymInteger(perm, ""), exp[i]);
+                                rez += aux;
                             }
                         }
                         table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
@@ -261,7 +271,7 @@ public class Eval {
         String[] exp = ((VarDecl) v).getWords();
         if (Eval.isVarDecl(v)) {
             if (exp[0].startsWith("Int")) {
-                SymInteger s = new SymInteger(null, exp[1]);
+                SymInteger s = new SymInteger(exp[1]);
                 if (Eval.lookUp(table, exp[1]) == null) {
                     table.addSymbol(s.getLabel(), s);
                     return (VarDecl) v;
@@ -269,7 +279,7 @@ public class Eval {
                 throw new SymbolException("Variable: " + s.getLabel() + " cannot be added twice.");
             }
             if (exp[0].startsWith("Bool")) {
-                SymBoolean s = new SymBoolean(null, exp[1]);
+                SymBoolean s = new SymBoolean(exp[1]);
                 if (Eval.lookUp(table, exp[1]) == null) {
                     table.addSymbol(s.getLabel(), s);
                     return (VarDecl) v;
@@ -288,7 +298,7 @@ public class Eval {
                 String[] exp = ((PrintStmt) v).getWords();
                 if (exp[1].startsWith("\"")) {
                     String rez = ((PrintStmt) v).getWords()[1].split("\"")[1];
-                    output.addLast(rez);
+                    output.addFirst(rez);
                     return (PrintStmt) v;
                 }
                 String label = exp[1].split("\\)")[0];
@@ -297,11 +307,11 @@ public class Eval {
                     throw new SymbolException("Variable is not declared.");
                 }
                 if (sym.getType() == "Int") {
-                    output.addLast(Integer.toString(((SymInteger) sym).getValue()));
+                    output.addFirst(Integer.toString(((SymInteger) sym).getValue()));
                     return (PrintStmt) v;
                 }
                 if (sym.getType() == "Bool") {
-                    output.addLast(Boolean.toString(((SymBoolean) sym).getValue()));
+                    output.addFirst(Boolean.toString(((SymBoolean) sym).getValue()));
                     return (PrintStmt) v;
                 }
 
@@ -326,9 +336,8 @@ public class Eval {
                     if (sym == null && a == null && b == null) {
                         throw new SymbolException("Condition cannot be evaluated");
                     }
-                    if (((SymInteger) sym).getValue() != 0 || ((SymBoolean) sym).getValue() != false
-                            || (a != null && a != 0) || (b != null && b != false)) { // Evaluating it as true
-                        if (sym.getType() == "Int") {
+                    if (sym.getType() == "Int") {
+                        if (((SymInteger) sym).getValue() != 0 || (a != null && a != 0)) { // Evaluating it as true
                             // Can only be an assignment or a print statement
                             AssignStmt checkAssign = new AssignStmt(exp[3]);
                             checkAssign = Eval.processAssign(table, checkAssign);
@@ -341,67 +350,69 @@ public class Eval {
                                 stack.addFirst(checkPrint);
                             } else
                                 stack.addFirst(checkAssign);
+                        }
 
-                            if (exp.length == 4) {
-                                return (IfStmt) conditional;
-                            } else {
-                                // Now we do the else branch
-                                checkAssign = new AssignStmt(exp[5]);
-                                checkAssign = Eval.processAssign(table, checkAssign);
-                                if (checkAssign == null) { // If it's not one, the it's the other
-                                    PrintStmt checkPrint = new PrintStmt(exp[5]);
-                                    checkPrint = Eval.processPrint(output, table, checkPrint);
-                                    if (checkPrint == null) {
-                                        throw new StmtException("Instruction cannot be done");
-                                    }
-                                    stack.addFirst(checkPrint);
-                                    return (IfStmt) conditional;
-                                } else {
-                                    stack.addFirst(checkAssign);
-                                    return (IfStmt) conditional;
+                        if (exp.length == 4) {
+                            return (IfStmt) conditional;
+                        } else {
+                            // Now we do the else branch
+                            AssignStmt checkAssign = new AssignStmt(exp[5]);
+                            checkAssign = Eval.processAssign(table, checkAssign);
+                            if (checkAssign == null) { // If it's not one, the it's the other
+                                PrintStmt checkPrint = new PrintStmt(exp[5]);
+                                checkPrint = Eval.processPrint(output, table, checkPrint);
+                                if (checkPrint == null) {
+                                    throw new StmtException("Instruction cannot be done");
                                 }
-                            }
-                        }
-
-                        if (sym.getType() == "Bool") {
-                            if (((SymBoolean) sym).getValue() != false || (b != null && b != false)) { //
-                                // Evaluating it
-                                // as
-                                // true
-                                // Can only be an assignment or a print statement
-                                AssignStmt checkAssign = new AssignStmt(exp[3]);
-                                checkAssign = Eval.processAssign(table, checkAssign);
-                                if (checkAssign == null) { // If it's not one, the it's the other
-                                    PrintStmt checkPrint = new PrintStmt(exp[3]);
-                                    checkPrint = Eval.processPrint(output, table, checkPrint);
-                                    if (checkPrint == null) {
-                                        throw new StmtException("Instruction cannot be done");
-                                    }
-                                    stack.addFirst(checkPrint);
-                                } else
-                                    stack.addFirst(checkAssign);
-                            }
-                            if (exp.length == 4) {
+                                stack.addFirst(checkPrint);
                                 return (IfStmt) conditional;
                             } else {
-                                // Now we do the else branch
-                                AssignStmt checkAssign = new AssignStmt(exp[5]);
-                                checkAssign = Eval.processAssign(table, checkAssign);
-                                if (checkAssign == null) { // If it's not one, the it's the other
-                                    PrintStmt checkPrint = new PrintStmt(exp[5]);
-                                    checkPrint = Eval.processPrint(output, table, checkPrint);
-                                    if (checkPrint == null) {
-                                        throw new StmtException("Instruction cannot be done");
-                                    }
-                                    stack.addFirst(checkPrint);
-                                } else
-                                    stack.addFirst(checkAssign);
+                                stack.addFirst(checkAssign);
                                 return (IfStmt) conditional;
-
                             }
                         }
+
+                    }
+
+                    if (sym.getType() == "Bool") {
+                        if (((SymBoolean) sym).getValue() != false || (b != null && b != false)) {
+                            // Evaluating it as true.
+                            // Can only be an assignment or a print statement
+                            AssignStmt checkAssign = new AssignStmt(exp[3]);
+                            checkAssign = Eval.processAssign(table, checkAssign);
+                            if (checkAssign == null) { // If it's not one, the it's the other
+                                PrintStmt checkPrint = new PrintStmt(exp[3]);
+                                checkPrint = Eval.processPrint(output, table, checkPrint);
+                                if (checkPrint == null) {
+                                    throw new StmtException("Instruction cannot be done");
+                                }
+                                stack.addFirst(checkPrint);
+                            } else
+                                stack.addFirst(checkAssign);
+                        }
+                        if (exp.length == 4) {
+                            return (IfStmt) conditional;
+                        } else {
+                            // Now we do the else branch
+                            AssignStmt checkAssign = new AssignStmt(exp[5]);
+                            checkAssign = Eval.processAssign(table, checkAssign);
+                            if (checkAssign == null) { // If it's not one, the it's the other
+                                PrintStmt checkPrint = new PrintStmt(exp[5]);
+                                checkPrint = Eval.processPrint(output, table, checkPrint);
+                                if (checkPrint == null) {
+                                    throw new StmtException("Instruction cannot be done");
+                                }
+                                stack.addFirst(checkPrint);
+                            } else {
+                                stack.addFirst(checkAssign);
+                                return (IfStmt) conditional;
+                            }
+
+                        }
+                        return (IfStmt) null;
                     }
                 }
+
             } catch (SymbolException e) {
                 throw new SymbolException(e.getMessage());
             } catch (TypeException t) {
