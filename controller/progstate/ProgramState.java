@@ -1,13 +1,15 @@
 package controller.progstate;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import controller.evaluation.Eval;
+import controller.evaluation.EvalUtil;
 import controller.exestack.ExeStack;
 import controller.exestack.MyDeque;
+import controller.filetable.FileTable;
 import controller.symtable.SymTable;
 import exceptions.DivisionByZero;
 import exceptions.FileException;
@@ -16,38 +18,43 @@ import exceptions.SymbolException;
 import exceptions.TypeException;
 import model.statements.*;
 import model.symbol.ISymbol;
+import model.symbol.SymBoolean;
+import model.symbol.SymInteger;
+import model.symbol.SymString;
 
 public class ProgramState implements IProgramState {
 
-    private SymTable<String, ISymbol> table;
+    private SymTable<String, ISymbol> symtable;
     private ExeStack stack;
     private MyDeque<String> output;
+    private FileTable<SymString, BufferedReader> filetable;
 
     public ProgramState(String program) {
-        this.table = new SymTable<String, ISymbol>();
+        this.symtable = new SymTable<String, ISymbol>();
         this.stack = new ExeStack();
         this.output = new MyDeque<String>();
+        this.filetable = new FileTable<>();
         this.stack.addLast(new CompStmt(new String(program)));
     }
 
-    public SymTable<String, ISymbol> getTable() {
-        return this.table;
+    @Override
+    public SymTable<String, ISymbol> getSymTable() {
+        return this.symtable;
     }
 
+    @Override
     public ExeStack getStack() {
         return this.stack;
     }
 
+    @Override
     public MyDeque<String> getOutput() {
         return this.output;
     }
 
-    public String toPrint(String prev) {
-        String lastOut = this.output.getFirst();
-        if (lastOut != null && !lastOut.startsWith(prev)) {
-            return lastOut;
-        }
-        return null;
+    @Override
+    public FileTable<SymString, BufferedReader> getFileTable() {
+        return this.filetable;
     }
 
     @Override
@@ -58,7 +65,7 @@ public class ProgramState implements IProgramState {
         try {
             // IStmt nexCompStmt = ((CompStmt) comp).nextCompStmt();
             AssignStmt stmt = new AssignStmt(assignContent);
-            AssignStmt astmt = Eval.processAssign(table, stmt);
+            AssignStmt astmt = EvalUtil.processAssign(symtable, stmt);
             if (astmt == null)
                 return;
             this.stack.removeLast();
@@ -80,7 +87,7 @@ public class ProgramState implements IProgramState {
         String declContent = comp.getStmt();
         try {
             VarDecl v = new VarDecl(declContent);
-            VarDecl dstmt = Eval.processDecl(table, v);
+            VarDecl dstmt = EvalUtil.processDecl(symtable, v);
             if (dstmt == null)
                 return;
             this.stack.removeLast();
@@ -99,7 +106,7 @@ public class ProgramState implements IProgramState {
         String condContent = comp.getStmt();
         try {
             IfStmt conditional = new IfStmt(condContent);
-            IfStmt cond = Eval.processConditional(stack, output, table, conditional);
+            IfStmt cond = EvalUtil.processConditional(stack, output, symtable, conditional);
             // String prev = this.output.getFirst();
             if (cond == null) {
                 return;
@@ -126,15 +133,13 @@ public class ProgramState implements IProgramState {
         String printContent = comp.getStmt();
         try {
             PrintStmt print = new PrintStmt(printContent);
-            PrintStmt check = Eval.processPrint(output, table, print);
+            PrintStmt check = EvalUtil.processPrint(output, symtable, print);
             if (check == null) {
                 return;
             }
             this.stack.removeLast();
             this.stack.addLast(comp.nextCompStmt());
             this.stack.addFirst(check);
-            // String prev = this.output.getFirst();
-            // return this.toPrint(prev);
         } catch (SymbolException s) {
             throw new SymbolException(s.getMessage());
         }
@@ -179,17 +184,50 @@ public class ProgramState implements IProgramState {
     }
 
     @Override
-    public void logProgramStateExec(Integer exec_no) throws FileException {
+    public void logProgramStateExec() throws FileException {
         try {
             PrintWriter logFile = new PrintWriter(new BufferedWriter(new FileWriter(
                     "C:\\Users\\maria\\Documents\\Code\\LABS\\Labs MAP\\Toy-Language-Interpreter\\logFile.txt", true)));
             logFile.flush();
-            logFile.write("Execution no. " + exec_no.toString() + "\n");
+            // Writing the stack to the log file
+            logFile.append("Execution stack:\n");
             for (int i = 0; i < this.stack.size(); i++) {
                 // logFile.println(this.stack.getElem(i).getContents());
-                logFile.write(this.stack.getElem(i).getContents() + "\n");
+                logFile.append(this.stack.getElem(i).getContents() + "\n");
             }
-            logFile.write("\n");
+            logFile.append("\n");
+
+            logFile.append("Symbols symtable:\n");
+            for (String key : this.symtable.getAll().keySet()) {
+                ISymbol sym = this.symtable.getSymbol(key);
+                if (sym.getType() == "Int") {
+                    if (((SymInteger) sym).getValue() == null)
+                        logFile.append(sym.getType() + " " + sym.getLabel() + ": "
+                                + "Not declared" + "\n");
+                    else
+                        logFile.append(sym.getType() + " " + sym.getLabel() + ": "
+                                + ((SymInteger) sym).getValue().toString() + "\n");
+                }
+
+                if (sym.getType() == "Bool") {
+                    if (((SymBoolean) sym).getValue() == null)
+                        logFile.append(sym.getType() + " " + sym.getLabel() + ": "
+                                + "Not declared" + "\n");
+                    else
+                        logFile.append(sym.getType() + " " + sym.getLabel() + ": "
+                                + ((SymBoolean) sym).getValue().toString() + "\n");
+                }
+
+                if (sym.getType() == "String")
+                    logFile.append(sym.getType() + " " + sym.getLabel() + ": " + ((SymString) sym).getValue() + "\n");
+            }
+            logFile.append("\n");
+
+            logFile.append("Output stack:\n");
+            for (int i = 0; i < this.output.size(); i++) {
+                logFile.append(this.output.get(i).toString() + "\n");
+            }
+            logFile.append("\n");
             logFile.close();
         } catch (IOException e) {
             throw new FileException("Cannot open log file");

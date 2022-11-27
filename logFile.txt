@@ -1,21 +1,38 @@
-Execution no. 1
+Execution stack:
 Int b
 b = 2 + 3; Int c; c = 2; b = 3 * c; Bool bol; bol = false and true; Print(bol); Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
 
-Execution no. 2
+Symbols table:
+Int b: Not declared
+
+Output stack:
+
+Execution stack:
 Int c
 b = 2 + 3
 Int b
 c = 2; b = 3 * c; Bool bol; bol = false and true; Print(bol); Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
 
-Execution no. 3
+Symbols table:
+Int b: 5
+Int c: Not declared
+
+Output stack:
+
+Execution stack:
 c = 2
 Int c
 b = 2 + 3
 Int b
 b = 3 * c; Bool bol; bol = false and true; Print(bol); Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
 
-Execution no. 4
+Symbols table:
+Int b: 5
+Int c: 2
+
+Output stack:
+
+Execution stack:
 Bool bol
 b = 3 * c
 c = 2
@@ -24,7 +41,14 @@ b = 2 + 3
 Int b
 bol = false and true; Print(bol); Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
 
-Execution no. 5
+Symbols table:
+Int b: 3
+Int c: 2
+Bool bol: Not declared
+
+Output stack:
+
+Execution stack:
 Print(bol)
 bol = false and true
 Bool bol
@@ -35,7 +59,15 @@ b = 2 + 3
 Int b
 Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
 
-Execution no. 6
+Symbols table:
+Int b: 3
+Int c: 2
+Bool bol: false
+
+Output stack:
+false
+
+Execution stack:
 Print("Condition not met")
 Print(bol)
 bol = false and true
@@ -47,7 +79,16 @@ b = 2 + 3
 Int b
 If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
 
-Execution no. 7
+Symbols table:
+Int b: 3
+Int c: 2
+Bool bol: false
+
+Output stack:
+Condition not met
+false
+
+Execution stack:
 If bol Then Print("In fiecare zi vad garda") Else b = 1;
 b = 1
 Print("Condition not met")
@@ -60,4 +101,13 @@ Int c
 b = 2 + 3
 Int b
 
+
+Symbols table:
+Int b: 1
+Int c: 2
+Bool bol: false
+
+Output stack:
+Condition not met
+false
 

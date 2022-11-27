@@ -6,15 +6,15 @@ public class SymBoolean implements ISymbol {
     private String label;
 
     public SymBoolean(Boolean val, String label) {
-        this.setType("Bool");
+        this.type = "Bool";
         this.value = val;
-        this.setLabel(label);
+        this.label = label;
     }
 
     public SymBoolean(String label) {
         this.defaultValue();
-        this.setType("Bool");
-        this.setLabel(label);
+        this.type = "Bool";
+        this.label = label;
     }
 
     public void setValue(Boolean val) {
@@ -26,18 +26,8 @@ public class SymBoolean implements ISymbol {
     }
 
     @Override
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Override
     public String getType() {
         return this.type;
-    }
-
-    @Override
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     @Override

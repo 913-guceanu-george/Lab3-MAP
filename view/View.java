@@ -22,7 +22,7 @@ public class View implements IView {
 
     @Override
     public void displayProgState() {
-        SymTable<String, ISymbol> table = this.progState.getTable();
+        SymTable<String, ISymbol> table = this.progState.getSymTable();
         ExeStack stack = this.progState.getStack();
         MyDeque<String> output = this.progState.getOutput();
 
@@ -45,13 +45,12 @@ public class View implements IView {
     public void execute() {
         try {
             IStmt last;
-            Integer exec_no = 1;
             while (true) {
                 //
                 last = this.progState.getStack().getLast();
                 if (last.getType() == "NOP") {
                     this.displayProgState();
-                    this.progState.logProgramStateExec(exec_no);
+                    this.progState.logProgramStateExec();
                     System.exit(0);
                 }
                 this.progState.nextIsIf();
@@ -59,7 +58,7 @@ public class View implements IView {
                 last = this.progState.getStack().getLast();
                 if (last.getType() == "NOP") {
                     this.displayProgState();
-                    this.progState.logProgramStateExec(exec_no);
+                    this.progState.logProgramStateExec();
                     System.exit(0);
                 }
                 this.progState.nextIsAssign();
@@ -67,7 +66,7 @@ public class View implements IView {
                 last = this.progState.getStack().getLast();
                 if (last.getType() == "NOP") {
                     this.displayProgState();
-                    this.progState.logProgramStateExec(exec_no);
+                    this.progState.logProgramStateExec();
                     System.exit(0);
                 }
                 this.progState.nextIsDecl();
@@ -75,20 +74,20 @@ public class View implements IView {
                 last = this.progState.getStack().getLast();
                 if (last.getType() == "NOP") {
                     this.displayProgState();
-                    this.progState.logProgramStateExec(exec_no);
+                    this.progState.logProgramStateExec();
                     System.exit(0);
                 }
                 this.progState.nextIsPrint();
                 last = this.progState.getStack().getLast();
                 if (last.getType() == "NOP") {
                     this.displayProgState();
-                    this.progState.logProgramStateExec(exec_no);
+                    this.progState.logProgramStateExec();
                     System.exit(0);
                 }
                 // this.progState.nextStep();
                 this.displayProgState();
-                this.progState.logProgramStateExec(exec_no);
-                exec_no++;
+                this.progState.logProgramStateExec();
+                // ++;
             }
         } catch (SymbolException s) {
             System.out.println(s.getMessage());

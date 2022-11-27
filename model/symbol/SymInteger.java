@@ -6,15 +6,15 @@ public class SymInteger implements ISymbol {
     private String type;
 
     public SymInteger(Integer val, String label) {
-        this.setType("Int");
+        this.type = "Int";
         this.value = val;
-        this.setLabel(label);
+        this.label = label;
     }
 
     public SymInteger(String label) {
         this.defaultValue();
-        this.setLabel(label);
-        this.setType("Int");
+        this.label = label;
+        this.type = "Int";
     }
 
     public void setValue(Integer val) {
@@ -26,18 +26,8 @@ public class SymInteger implements ISymbol {
     }
 
     @Override
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Override
     public String getType() {
         return this.type;
-    }
-
-    @Override
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     @Override

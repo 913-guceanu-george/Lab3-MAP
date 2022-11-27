@@ -7,30 +7,20 @@ public class SymString implements ISymbol {
     private String type;
 
     public SymString(String label, String value) {
-        this.setType("String");
-        this.setLabel(label);
+        this.type = "String";
+        this.label = label;
         this.value = new String(value);
     }
 
     public SymString(String label) {
-        this.setType("String");
+        this.type = "String";
+        this.label = label;
         this.defaultValue();
-        this.setLabel(label);
-    }
-
-    @Override
-    public void setType(String type) {
-        this.type = type;
     }
 
     @Override
     public String getType() {
         return this.type;
-    }
-
-    @Override
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     @Override

@@ -10,7 +10,7 @@ import exceptions.TypeException;
 import model.statements.*;
 import model.symbol.*;
 
-public class Eval {
+public class EvalUtil {
 
     public static ISymbol lookUp(SymTable<String, ISymbol> table, String label) {
         // Null if it can't find one or the sym.
@@ -26,7 +26,7 @@ public class Eval {
     }
 
     public static Integer evalInt(ISymbol sym) {
-        if (Eval.isInt(sym)) {
+        if (EvalUtil.isInt(sym)) {
             return ((SymInteger) sym).getValue();
         }
         return null;
@@ -41,7 +41,7 @@ public class Eval {
     }
 
     public static Boolean evalBoolean(ISymbol sym) {
-        if (Eval.isBool(sym)) {
+        if (EvalUtil.isBool(sym)) {
             return ((SymBoolean) sym).getValue();
         }
         return null;
@@ -165,23 +165,23 @@ public class Eval {
      */
     public static AssignStmt processAssign(SymTable<String, ISymbol> table, IStmt stmt)
             throws TypeException, SymbolException, DivisionByZero {
-        if (Eval.isAssignStmt(stmt)) { // First we check if it's an assign statement
+        if (EvalUtil.isAssignStmt(stmt)) { // First we check if it's an assign statement
             try {
                 String[] exp = ((AssignStmt) stmt).getWords();
-                ISymbol sym = Eval.lookUp(table, exp[0]); // We get the symbol, lookUp automatically checks if it's in
+                ISymbol sym = EvalUtil.lookUp(table, exp[0]); // We get the symbol, lookUp automatically checks if it's in
                                                           // the table
                 if (sym == null) {
                     throw new SymbolException("Variable is not declared.");
                 }
-                if (Eval.isInt(sym)) { // If our symbol is an integer
+                if (EvalUtil.isInt(sym)) { // If our symbol is an integer
                     Integer rez = 0;
                     if (exp.length == 3) { // If it's just a simple assignment
-                        rez = Eval.isNumeric(exp[2]);
+                        rez = EvalUtil.isNumeric(exp[2]);
                         if (rez != null) { // Checking if we are assigning a variable only a value
                             table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
                             return (AssignStmt) stmt;
                         } else { // If it's not a value, than it is the value of another variable
-                            rez = ((SymInteger) Eval.lookUp(table, exp[2])).getValue();
+                            rez = ((SymInteger) EvalUtil.lookUp(table, exp[2])).getValue();
                             if (rez == null) {
                                 throw new SymbolException("Variable is not declared.");
                             }
@@ -190,23 +190,23 @@ public class Eval {
                         }
                     } else { // If it's a compund assingment
                         // First value of the assignment
-                        rez = Eval.isNumeric(exp[2]);
+                        rez = EvalUtil.isNumeric(exp[2]);
                         if (rez == null)
-                            rez = ((SymInteger) Eval.lookUp(table, exp[2])).getValue();
+                            rez = ((SymInteger) EvalUtil.lookUp(table, exp[2])).getValue();
                         if (rez == null) {
                             throw new SymbolException("Variable is not declared.");
                         }
                         // Rest of the values
                         for (int i = 3; i < exp.length - 1; i = i + 2) {
-                            ISymbol s2 = Eval.lookUp(table, exp[i + 1]);
+                            ISymbol s2 = EvalUtil.lookUp(table, exp[i + 1]);
                             if (s2 != null) {
-                                rez += Eval.evalArithemtic(new SymInteger(rez, ""), s2, exp[i]);
+                                rez += EvalUtil.evalArithemtic(new SymInteger(0, ""), s2, exp[i]);
                             } else {
-                                Integer perm = Eval.isNumeric(exp[i + 1]);
+                                Integer perm = EvalUtil.isNumeric(exp[i + 1]);
                                 if (perm == null) {
                                     throw new SymbolException("Variable is not declared.");
                                 }
-                                Integer aux = Eval.evalArithemtic(new SymInteger(0, ""),
+                                Integer aux = EvalUtil.evalArithemtic(new SymInteger(0, ""),
                                         new SymInteger(perm, ""), exp[i]);
                                 rez += aux;
                             }
@@ -217,15 +217,15 @@ public class Eval {
                     }
                 }
                 // Analog for the boolean value
-                if (Eval.isBool(sym)) {
+                if (EvalUtil.isBool(sym)) {
                     Boolean rez = null;
                     if (exp.length == 3) {
-                        rez = Eval.isBoolean(exp[2]);
+                        rez = EvalUtil.isBoolean(exp[2]);
                         if (rez != null) {
                             table.setSymbol(sym.getLabel(), new SymBoolean(rez, sym.getLabel()));
                             return (AssignStmt) stmt;
                         } else {
-                            rez = ((SymBoolean) Eval.lookUp(table, exp[2])).getValue();
+                            rez = ((SymBoolean) EvalUtil.lookUp(table, exp[2])).getValue();
                             if (rez == null) {
                                 throw new SymbolException("Variable is not declared.");
                             }
@@ -233,22 +233,22 @@ public class Eval {
                             return (AssignStmt) stmt;
                         }
                     } else {
-                        rez = Eval.isBoolean(exp[2]);
+                        rez = EvalUtil.isBoolean(exp[2]);
                         if (rez == null)
-                            rez = ((SymBoolean) Eval.lookUp(table, exp[2])).getValue();
+                            rez = ((SymBoolean) EvalUtil.lookUp(table, exp[2])).getValue();
                         if (rez == null) {
                             throw new SymbolException("Variable is not declared.");
                         }
                         for (int i = 3; i < exp.length - 1; i = i + 2) {
-                            ISymbol s2 = Eval.lookUp(table, exp[i + 1]);
+                            ISymbol s2 = EvalUtil.lookUp(table, exp[i + 1]);
                             if (s2 != null) {
-                                rez = Eval.evalLogical(new SymBoolean(rez, ""), s2, exp[i]);
+                                rez = EvalUtil.evalLogical(new SymBoolean(rez, ""), s2, exp[i]);
                             } else {
-                                Boolean perm = Eval.isBoolean(exp[i + 1]);
+                                Boolean perm = EvalUtil.isBoolean(exp[i + 1]);
                                 if (perm == null) {
                                     throw new SymbolException("Variable is not declared.");
                                 }
-                                rez = Eval.evalLogical(new SymBoolean(rez, ""),
+                                rez = EvalUtil.evalLogical(new SymBoolean(rez, ""),
                                         new SymBoolean(perm, ""), exp[i]);
                             }
                         }
@@ -269,10 +269,10 @@ public class Eval {
 
     public static VarDecl processDecl(SymTable<String, ISymbol> table, IStmt v) throws SymbolException {
         String[] exp = ((VarDecl) v).getWords();
-        if (Eval.isVarDecl(v)) {
+        if (EvalUtil.isVarDecl(v)) {
             if (exp[0].startsWith("Int")) {
                 SymInteger s = new SymInteger(exp[1]);
-                if (Eval.lookUp(table, exp[1]) == null) {
+                if (EvalUtil.lookUp(table, exp[1]) == null) {
                     table.addSymbol(s.getLabel(), s);
                     return (VarDecl) v;
                 }
@@ -280,7 +280,7 @@ public class Eval {
             }
             if (exp[0].startsWith("Bool")) {
                 SymBoolean s = new SymBoolean(exp[1]);
-                if (Eval.lookUp(table, exp[1]) == null) {
+                if (EvalUtil.lookUp(table, exp[1]) == null) {
                     table.addSymbol(s.getLabel(), s);
                     return (VarDecl) v;
                 }
@@ -293,7 +293,7 @@ public class Eval {
 
     public static PrintStmt processPrint(MyDeque<String> output, SymTable<String, ISymbol> table, IStmt v)
             throws SymbolException {
-        if (Eval.isPrintStmt(v)) {
+        if (EvalUtil.isPrintStmt(v)) {
             try {
                 String[] exp = ((PrintStmt) v).getWords();
                 if (exp[1].startsWith("\"")) {
@@ -302,7 +302,7 @@ public class Eval {
                     return (PrintStmt) v;
                 }
                 String label = exp[1].split("\\)")[0];
-                ISymbol sym = Eval.lookUp(table, label);
+                ISymbol sym = EvalUtil.lookUp(table, label);
                 if (sym == null) {
                     throw new SymbolException("Variable is not declared.");
                 }
@@ -325,14 +325,14 @@ public class Eval {
 
     public static IfStmt processConditional(ExeStack stack, MyDeque<String> output, SymTable<String, ISymbol> table,
             IStmt conditional) throws SymbolException, TypeException, DivisionByZero, StmtException {
-        if (Eval.isIfStmt(conditional)) {
+        if (EvalUtil.isIfStmt(conditional)) {
             try {
                 String[] exp = ((IfStmt) conditional).getWords(); // Splitting into expressions
                 String[] firstExp = exp[1].split(" ");
                 if (firstExp.length == 1) { // First case, it has only a variable
-                    Integer a = Eval.isNumeric(firstExp[0]);
-                    Boolean b = Eval.isBoolean(firstExp[0]);
-                    ISymbol sym = Eval.lookUp(table, firstExp[0]);
+                    Integer a = EvalUtil.isNumeric(firstExp[0]);
+                    Boolean b = EvalUtil.isBoolean(firstExp[0]);
+                    ISymbol sym = EvalUtil.lookUp(table, firstExp[0]);
                     if (sym == null && a == null && b == null) {
                         throw new SymbolException("Condition cannot be evaluated");
                     }
@@ -340,10 +340,10 @@ public class Eval {
                         if (((SymInteger) sym).getValue() != 0 || (a != null && a != 0)) { // Evaluating it as true
                             // Can only be an assignment or a print statement
                             AssignStmt checkAssign = new AssignStmt(exp[3]);
-                            checkAssign = Eval.processAssign(table, checkAssign);
+                            checkAssign = EvalUtil.processAssign(table, checkAssign);
                             if (checkAssign == null) { // If it's not one, the it's the other
                                 PrintStmt checkPrint = new PrintStmt(exp[3]);
-                                checkPrint = Eval.processPrint(output, table, checkPrint);
+                                checkPrint = EvalUtil.processPrint(output, table, checkPrint);
                                 if (checkPrint == null) {
                                     throw new StmtException("Instruction cannot be done");
                                 }
@@ -357,10 +357,10 @@ public class Eval {
                         } else {
                             // Now we do the else branch
                             AssignStmt checkAssign = new AssignStmt(exp[5]);
-                            checkAssign = Eval.processAssign(table, checkAssign);
+                            checkAssign = EvalUtil.processAssign(table, checkAssign);
                             if (checkAssign == null) { // If it's not one, the it's the other
                                 PrintStmt checkPrint = new PrintStmt(exp[5]);
-                                checkPrint = Eval.processPrint(output, table, checkPrint);
+                                checkPrint = EvalUtil.processPrint(output, table, checkPrint);
                                 if (checkPrint == null) {
                                     throw new StmtException("Instruction cannot be done");
                                 }
@@ -379,10 +379,10 @@ public class Eval {
                             // Evaluating it as true.
                             // Can only be an assignment or a print statement
                             AssignStmt checkAssign = new AssignStmt(exp[3]);
-                            checkAssign = Eval.processAssign(table, checkAssign);
+                            checkAssign = EvalUtil.processAssign(table, checkAssign);
                             if (checkAssign == null) { // If it's not one, the it's the other
                                 PrintStmt checkPrint = new PrintStmt(exp[3]);
-                                checkPrint = Eval.processPrint(output, table, checkPrint);
+                                checkPrint = EvalUtil.processPrint(output, table, checkPrint);
                                 if (checkPrint == null) {
                                     throw new StmtException("Instruction cannot be done");
                                 }
@@ -395,10 +395,10 @@ public class Eval {
                         } else {
                             // Now we do the else branch
                             AssignStmt checkAssign = new AssignStmt(exp[5]);
-                            checkAssign = Eval.processAssign(table, checkAssign);
+                            checkAssign = EvalUtil.processAssign(table, checkAssign);
                             if (checkAssign == null) { // If it's not one, the it's the other
                                 PrintStmt checkPrint = new PrintStmt(exp[5]);
-                                checkPrint = Eval.processPrint(output, table, checkPrint);
+                                checkPrint = EvalUtil.processPrint(output, table, checkPrint);
                                 if (checkPrint == null) {
                                     throw new StmtException("Instruction cannot be done");
                                 }

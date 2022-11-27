@@ -45,4 +45,8 @@ public class SymTable<Key, Value> implements ISymTable<Key, Value> {
         }
         return rez;
     }
+
+    public int size() {
+        return this.symbols.size();
+    }
 }
