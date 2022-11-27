@@ -46,37 +46,40 @@ public class View implements IView {
         try {
             IStmt last;
             while (true) {
-                //
+                this.displayProgState();
+                this.progState.logProgramStateExec();
+                // After each step we have to check if the program's execution has ended
                 last = this.progState.getStack().getLast();
                 if (last.getType() == "NOP") {
                     this.displayProgState();
                     this.progState.logProgramStateExec();
                     System.exit(0);
                 }
+                // Conditional case
                 this.progState.nextIsIf();
-                //
                 last = this.progState.getStack().getLast();
                 if (last.getType() == "NOP") {
                     this.displayProgState();
                     this.progState.logProgramStateExec();
                     System.exit(0);
                 }
+                // Assign case
                 this.progState.nextIsAssign();
-                //
                 last = this.progState.getStack().getLast();
                 if (last.getType() == "NOP") {
                     this.displayProgState();
                     this.progState.logProgramStateExec();
                     System.exit(0);
                 }
+                // Declaration case
                 this.progState.nextIsDecl();
-                //
                 last = this.progState.getStack().getLast();
                 if (last.getType() == "NOP") {
                     this.displayProgState();
                     this.progState.logProgramStateExec();
                     System.exit(0);
                 }
+                // Print case
                 this.progState.nextIsPrint();
                 last = this.progState.getStack().getLast();
                 if (last.getType() == "NOP") {
@@ -84,9 +87,31 @@ public class View implements IView {
                     this.progState.logProgramStateExec();
                     System.exit(0);
                 }
+                // File open case
+                this.progState.nextIsOpen();
+                last = this.progState.getStack().getLast();
+                if (last.getType() == "NOP") {
+                    this.displayProgState();
+                    this.progState.logProgramStateExec();
+                    System.exit(0);
+                }
+                // Reading from file case
+                this.progState.nextIsRead();
+                last = this.progState.getStack().getLast();
+                if (last.getType() == "NOP") {
+                    this.displayProgState();
+                    this.progState.logProgramStateExec();
+                    System.exit(0);
+                }
+                // Closing a file case.
+                this.progState.nextIsClose();
+                last = this.progState.getStack().getLast();
+                if (last.getType() == "NOP") {
+                    this.displayProgState();
+                    this.progState.logProgramStateExec();
+                    System.exit(0);
+                }
                 // this.progState.nextStep();
-                this.displayProgState();
-                this.progState.logProgramStateExec();
                 // ++;
             }
         } catch (SymbolException s) {

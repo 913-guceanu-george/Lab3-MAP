@@ -146,41 +146,119 @@ public class ProgramState implements IProgramState {
     }
 
     @Override
-    public void nextStep() throws SymbolException, TypeException, DivisionByZero, StmtException {
+    public void nextIsOpen() throws FileException, SymbolException {
+        CompStmt comp = (CompStmt) this.stack.getLast();
+        String openContent = comp.getStmt();
         try {
-            IStmt last = this.stack.getLast();
-            if (last.getType() == "NOP") {
-                System.exit(0);
+            OpenRFile open = new OpenRFile(openContent);
+            OpenRFile check = EvalUtil.processOpen(symtable, filetable, open);
+            if (check == null) {
+                return;
             }
-            this.nextIsIf();
-            last = this.stack.getLast();
-            if (last.getType() == "NOP") {
-                System.exit(0);
-            }
-            this.nextIsAssign();
-            last = this.stack.getLast();
-            if (last.getType() == "NOP") {
-                System.exit(0);
-            }
-            this.nextIsDecl();
-            last = this.stack.getLast();
-            if (last.getType() == "NOP") {
-                System.exit(0);
-            }
-            this.nextIsPrint();
-            last = this.stack.getLast();
-            if (last.getType() == "NOP") {
-                System.exit(0);
-            }
+            this.stack.removeLast();
+            this.stack.addFirst(check);
+            this.stack.addLast(comp.nextCompStmt());
+        } catch (FileException f) {
+            throw new FileException(f.getMessage());
         } catch (SymbolException s) {
             throw new SymbolException(s.getMessage());
-        } catch (TypeException t) {
-            throw new TypeException(t.getMessage());
-        } catch (DivisionByZero d) {
-            throw new DivisionByZero(d.getMessage());
-        } catch (StmtException st) {
-            throw new StmtException(st.getMessage());
         }
+    }
+
+    @Override
+    public void nextIsRead() throws FileException, SymbolException {
+        CompStmt comp = (CompStmt) this.stack.getLast();
+        String readContent = comp.getStmt();
+        try {
+            ReadFile read = new ReadFile(readContent);
+            ReadFile check = EvalUtil.processRead(symtable, filetable, read);
+            if (check == null) {
+                return;
+            }
+            this.stack.removeLast();
+            this.stack.addFirst(check);
+            this.stack.addLast(comp.nextCompStmt());
+        } catch (FileException f) {
+            throw new FileException(f.getMessage());
+        } catch (SymbolException s) {
+            throw new SymbolException(s.getMessage());
+        }
+    }
+
+    @Override
+    public void nextIsClose() throws FileException, SymbolException {
+        CompStmt comp = (CompStmt) this.stack.getLast();
+        String closeContent = comp.getStmt();
+        try {
+            CloseRFile close = new CloseRFile(closeContent);
+            CloseRFile check = EvalUtil.processClose(symtable, filetable, close);
+            if (check == null) {
+                return;
+            }
+            this.stack.removeLast();
+            this.stack.addFirst(check);
+            this.stack.addLast(comp.nextCompStmt());
+        } catch (FileException f) {
+            throw new FileException(f.getMessage());
+        } catch (SymbolException s) {
+            throw new SymbolException(s.getMessage());
+        }
+    }
+
+    @Override
+    public void nextStep() throws SymbolException, TypeException, DivisionByZero, StmtException, FileException {
+        // try {
+        // IStmt last = this.stack.getLast();
+        // if (last.getType() == "NOP") {
+        // System.exit(0);
+        // }
+        // this.nextIsIf();
+        // last = this.stack.getLast();
+        // if (last.getType() == "NOP") {
+        // System.exit(0);
+        // }
+        // this.nextIsAssign();
+        // last = this.stack.getLast();
+        // if (last.getType() == "NOP") {
+        // System.exit(0);
+        // }
+        // this.nextIsDecl();
+        // last = this.stack.getLast();
+        // if (last.getType() == "NOP") {
+        // System.exit(0);
+        // }
+        // this.nextIsPrint();
+        // last = this.stack.getLast();
+        // if (last.getType() == "NOP") {
+        // System.exit(0);
+        // }
+        // this.nextIsOpen();
+        // last = this.stack.getLast();
+        // if (last.getType() == "NOP") {
+        // System.exit(0);
+        // }
+        // this.nextIsRead();
+        // last = this.stack.getLast();
+        // if (last.getType() == "NOP") {
+        // System.exit(0);
+        // }
+        // this.nextIsClose();
+        // last = this.stack.getLast();
+        // if (last.getType() == "NOP") {
+        // System.exit(0);
+        // }
+
+        // } catch (SymbolException s) {
+        // throw new SymbolException(s.getMessage());
+        // } catch (TypeException t) {
+        // throw new TypeException(t.getMessage());
+        // } catch (DivisionByZero d) {
+        // throw new DivisionByZero(d.getMessage());
+        // } catch (StmtException st) {
+        // throw new StmtException(st.getMessage());
+        // } catch (FileException f) {
+        // throw new FileException(f.getMessage());
+        // }
     }
 
     @Override

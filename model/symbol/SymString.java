@@ -30,7 +30,7 @@ public class SymString implements ISymbol {
 
     @Override
     public void defaultValue() {
-        this.setValue(null);
+        this.setValue("");
     }
 
     @Override
@@ -46,7 +46,10 @@ public class SymString implements ISymbol {
     }
 
     public String getValue() {
-        return this.value;
+        if (this.value == "") {
+            return "";
+        }
+        return this.value.split("\"")[1];
     }
 
 }

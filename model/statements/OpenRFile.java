@@ -1,15 +1,13 @@
 package model.statements;
 
-import model.symbol.SymString;
-
 public class OpenRFile implements IStmt {
 
     private String type;
-    private SymString contents;
+    private String contents;
 
-    public OpenRFile(SymString contents) {
+    public OpenRFile(String contents) {
         this.type = "OpenRFile";
-        this.contents = new SymString(contents.getLabel(), contents.getValue());
+        this.contents = contents;
     }
 
     @Override
@@ -19,7 +17,7 @@ public class OpenRFile implements IStmt {
 
     @Override
     public String getContents() {
-        return this.contents.getValue();
+        return this.contents;
     }
 
     @Override

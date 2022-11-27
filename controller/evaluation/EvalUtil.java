@@ -482,8 +482,8 @@ public class EvalUtil {
         return (IfStmt) null;
     }
 
-    public static OpenRFile processOpen(ExeStack stack, SymTable<String, ISymbol> table,
-            FileTable<SymString, BufferedReader> filetable, IStmt open) throws FileException {
+    public static OpenRFile processOpen(SymTable<String, ISymbol> table,
+            FileTable<SymString, BufferedReader> filetable, IStmt open) throws FileException, SymbolException {
         if (EvalUtil.isOpenRFile(open)) {
             String varLabel = ((OpenRFile) open).getWords()[1];
             ISymbol var = EvalUtil.lookUp(table, varLabel);
@@ -491,9 +491,9 @@ public class EvalUtil {
                 if (var != null) {
                     String filename = ((SymString) var).getValue();
                     filetable.add((SymString) var, new BufferedReader(new FileReader(filename)));
-                    stack.addFirst(open);
                     return (OpenRFile) open;
                 }
+                throw new SymbolException("Variable " + varLabel + " is not declared!");
             } catch (FileNotFoundException fne) {
                 throw new FileException("Cannot open file!");
             }
@@ -501,12 +501,12 @@ public class EvalUtil {
         return (OpenRFile) null;
     }
 
-    public static ReadFile processRead(ExeStack stack, SymTable<String, ISymbol> table,
+    public static ReadFile processRead(SymTable<String, ISymbol> table,
             FileTable<SymString, BufferedReader> filetable, IStmt read) throws FileException, SymbolException {
         if (EvalUtil.isReadFile(read)) {
             // Extracting all the variables we need
-            String filenameVarLabel = ((OpenRFile) read).getWords()[1];
-            String varLabel = ((OpenRFile) read).getWords()[2];
+            String filenameVarLabel = ((ReadFile) read).getWords()[1];
+            String varLabel = ((ReadFile) read).getWords()[2];
             ISymbol filenameVar = EvalUtil.lookUp(table, filenameVarLabel);
             ISymbol var = EvalUtil.lookUp(table, varLabel);
             try {
@@ -521,7 +521,6 @@ public class EvalUtil {
                             Integer val = EvalUtil.convNumeric(input);
                             if (val != null) {
                                 table.setSymbol(varLabel, new SymInteger(val, varLabel));
-                                stack.addFirst(read);
                                 return (ReadFile) read;
                             }
                             throw new SymbolException("Cannot give string value to an Integer");
@@ -537,7 +536,7 @@ public class EvalUtil {
         return (ReadFile) null;
     }
 
-    public static CloseRFile processClose(ExeStack stack, SymTable<String, ISymbol> table,
+    public static CloseRFile processClose(SymTable<String, ISymbol> table,
             FileTable<SymString, BufferedReader> filetable, IStmt read) throws SymbolException, FileException {
         if (EvalUtil.isCloseFile(read)) {
             String filenameVarLabel = ((CloseRFile) read).getWords()[1];
@@ -546,7 +545,6 @@ public class EvalUtil {
                 if (filenameVar != null) {
                     BufferedReader file = filetable.get((SymString) filenameVar);
                     file.close();
-                    stack.addFirst(read);
                     return (CloseRFile) read;
                 }
             } catch (IOException io) {

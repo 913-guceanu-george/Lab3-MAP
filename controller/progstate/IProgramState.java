@@ -29,7 +29,13 @@ public interface IProgramState {
 
     public void nextIsDecl() throws SymbolException;
 
-    public void nextStep() throws SymbolException, TypeException, DivisionByZero, StmtException;
+    public void nextIsOpen() throws FileException, SymbolException;
+
+    public void nextIsRead() throws FileException, SymbolException;
+
+    public void nextIsClose() throws FileException, SymbolException;
+
+    public void nextStep() throws SymbolException, TypeException, DivisionByZero, StmtException, FileException;
 
     // Loggers
     public void logProgramStateExec() throws FileException;
