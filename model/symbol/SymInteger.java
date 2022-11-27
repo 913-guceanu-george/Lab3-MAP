@@ -38,7 +38,7 @@ public class SymInteger implements ISymbol {
     @Override
     public String toString() {
         if (this.value == null) {
-            return "No value assigned";
+            return "Unassigned";
         }
         return this.type + ": " + this.value.toString();
     }

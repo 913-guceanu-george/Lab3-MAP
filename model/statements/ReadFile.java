@@ -25,9 +25,9 @@ public class ReadFile implements IStmt {
     @Override
     public String[] getWords() {
         String[] words = new String[3];
-        words[0] = this.contents.getValue().split("\\(")[0];
-        words[1] = this.contents.getValue().split("\\(")[1].split(", ")[0];
-        words[2] = this.contents.getValue().split("\\(")[1].split(", ")[1].split("\\)")[0];
+        words[0] = this.contents.getValue().split("\\(")[0];// readFile
+        words[1] = this.contents.getValue().split("\\(")[1].split(", ")[0];// exp
+        words[2] = this.contents.getValue().split("\\(")[1].split(", ")[1].split("\\)")[0]; // var
         return words;
     }
 

@@ -1,9 +1,21 @@
 Execution stack:
-Int b
-b = 2 + 3; Int c; c = 2; b = 3 * c; Bool bol; bol = false and true; Print(bol); Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
+String exp
+exp = "test.in"; Int b; b = 2 + 3; Int c; c = 2; b = 3 * c; Bool bol; bol = true; Print(bol); Print("Condition not met"); If c > b Then Print("In fiecare zi vad garda") Else b = 1;; 
 
-Symbols table:
+Symbols symtable:
+String exp: null
+
+Output stack:
+
+Execution stack:
+Int b
+exp = "test.in"
+String exp
+b = 2 + 3; Int c; c = 2; b = 3 * c; Bool bol; bol = true; Print(bol); Print("Condition not met"); If c > b Then Print("In fiecare zi vad garda") Else b = 1;; 
+
+Symbols symtable:
 Int b: Not declared
+String exp: "test.in"
 
 Output stack:
 
@@ -11,11 +23,14 @@ Execution stack:
 Int c
 b = 2 + 3
 Int b
-c = 2; b = 3 * c; Bool bol; bol = false and true; Print(bol); Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
+exp = "test.in"
+String exp
+c = 2; b = 3 * c; Bool bol; bol = true; Print(bol); Print("Condition not met"); If c > b Then Print("In fiecare zi vad garda") Else b = 1;; 
 
-Symbols table:
+Symbols symtable:
 Int b: 5
 Int c: Not declared
+String exp: "test.in"
 
 Output stack:
 
@@ -24,11 +39,14 @@ c = 2
 Int c
 b = 2 + 3
 Int b
-b = 3 * c; Bool bol; bol = false and true; Print(bol); Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
+exp = "test.in"
+String exp
+b = 3 * c; Bool bol; bol = true; Print(bol); Print("Condition not met"); If c > b Then Print("In fiecare zi vad garda") Else b = 1;; 
 
-Symbols table:
+Symbols symtable:
 Int b: 5
 Int c: 2
+String exp: "test.in"
 
 Output stack:
 
@@ -39,75 +57,87 @@ c = 2
 Int c
 b = 2 + 3
 Int b
-bol = false and true; Print(bol); Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
+exp = "test.in"
+String exp
+bol = true; Print(bol); Print("Condition not met"); If c > b Then Print("In fiecare zi vad garda") Else b = 1;; 
 
-Symbols table:
+Symbols symtable:
 Int b: 3
 Int c: 2
+String exp: "test.in"
 Bool bol: Not declared
 
 Output stack:
 
 Execution stack:
 Print(bol)
-bol = false and true
+bol = true
 Bool bol
 b = 3 * c
 c = 2
 Int c
 b = 2 + 3
 Int b
-Print("Condition not met"); If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
+exp = "test.in"
+String exp
+Print("Condition not met"); If c > b Then Print("In fiecare zi vad garda") Else b = 1;; 
 
-Symbols table:
+Symbols symtable:
 Int b: 3
 Int c: 2
-Bool bol: false
+String exp: "test.in"
+Bool bol: true
 
 Output stack:
-false
+true
 
 Execution stack:
 Print("Condition not met")
 Print(bol)
-bol = false and true
+bol = true
 Bool bol
 b = 3 * c
 c = 2
 Int c
 b = 2 + 3
 Int b
-If bol Then Print("In fiecare zi vad garda") Else b = 1;; 
+exp = "test.in"
+String exp
+If c > b Then Print("In fiecare zi vad garda") Else b = 1;; 
 
-Symbols table:
+Symbols symtable:
 Int b: 3
 Int c: 2
-Bool bol: false
+String exp: "test.in"
+Bool bol: true
 
 Output stack:
 Condition not met
-false
+true
 
 Execution stack:
-If bol Then Print("In fiecare zi vad garda") Else b = 1;
+If c > b Then Print("In fiecare zi vad garda") Else b = 1;
 b = 1
 Print("Condition not met")
 Print(bol)
-bol = false and true
+bol = true
 Bool bol
 b = 3 * c
 c = 2
 Int c
 b = 2 + 3
 Int b
+exp = "test.in"
+String exp
 
 
-Symbols table:
+Symbols symtable:
 Int b: 1
 Int c: 2
-Bool bol: false
+String exp: "test.in"
+Bool bol: true
 
 Output stack:
 Condition not met
-false
+true
 

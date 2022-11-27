@@ -28,16 +28,25 @@ public class SymString implements ISymbol {
         return this.label;
     }
 
+    @Override
+    public void defaultValue() {
+        this.setValue(null);
+    }
+
+    @Override
+    public String toString() {
+        if (this.value == null) {
+            return "Unassigned";
+        }
+        return this.getType() + ": " + this.getValue();
+    }
+
     public void setValue(String value) {
-        this.value = new String(value);
+        this.value = value;
     }
 
     public String getValue() {
         return this.value;
     }
 
-    @Override
-    public void defaultValue() {
-        this.setValue(null);
-    }
 }
