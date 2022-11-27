@@ -301,6 +301,14 @@ public class ProgramState implements IProgramState {
             }
             logFile.append("\n");
 
+            logFile.append("File table:\n");
+            for (SymString key : this.filetable.getAll().keySet()) {
+                BufferedReader sym = this.filetable.get(key);
+                Boolean b = sym.ready();
+                logFile.append(key.getValue() + ": " + b.toString() + "\n");
+            }
+            logFile.append("\n");
+
             logFile.append("Output stack:\n");
             for (int i = 0; i < this.output.size(); i++) {
                 logFile.append(this.output.get(i).toString() + "\n");

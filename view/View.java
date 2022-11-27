@@ -28,6 +28,7 @@ public class View implements IView {
 
         String tableStr = table.toString();
         String stackStr = stack.toString();
+        String filetableStr = this.progState.getFileTable().toString();
         String outputStr = "";
         if (output.size() == 0) {
             outputStr = "";
@@ -38,6 +39,7 @@ public class View implements IView {
         System.out.println("Table: " + tableStr);
         System.out.println("Stack: " + stackStr);
         System.out.println("Output: " + outputStr);
+        System.out.println("FileTable: " + filetableStr);
         System.out.println("\n");
     }
 

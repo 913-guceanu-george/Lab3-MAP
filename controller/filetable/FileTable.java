@@ -20,4 +20,20 @@ public class FileTable<Str, Reader> implements IFileTable<Str, Reader> {
         return this.filetable.get(filename);
     }
 
+    @Override
+    public HashMap<Str, Reader> getAll() {
+        return this.filetable;
+    }
+
+    @Override
+    public String toString() {
+        String rez = "";
+        if (filetable.size() == 0) {
+            return "";
+        }
+        for (Str k : this.filetable.keySet()) {
+            rez += k.toString() + " " + this.get(k).toString() + "| ";
+        }
+        return rez;
+    }
 }
