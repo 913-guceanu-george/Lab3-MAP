@@ -255,8 +255,17 @@ public class EvalUtil {
                                 if (perm == null) {
                                     throw new SymbolException("Variable is not declared.");
                                 }
-                                Integer aux = EvalUtil.evalArithemtic(new SymInteger(0, ""),
-                                        new SymInteger(perm, ""), exp[i]);
+                                Integer aux = 0;
+                                if (exp[i].startsWith("+")) {
+                                    aux = EvalUtil.evalArithemtic(new SymInteger(0, ""),
+                                            new SymInteger(perm, ""), exp[i]);
+                                    if (exp[i + 2].startsWith("*") || exp[i + 2].startsWith("/")) {
+                                        Integer aux2 = EvalUtil.convNumeric(exp[i + 1]);
+                                        aux += EvalUtil.evalArithemtic(new SymInteger(aux2, ""),
+                                                new SymInteger(EvalUtil.convNumeric(exp[i + 3]), ""), exp[i + 2]);
+                                        i += 2;
+                                    }
+                                }
                                 rez += aux;
                             }
                         }
