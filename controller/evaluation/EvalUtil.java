@@ -223,57 +223,38 @@ public class EvalUtil {
                     throw new SymbolException("Variable is not declared.");
                 }
                 if (EvalUtil.isInt(sym)) { // If our symbol is an integer
-                    Integer rez = 0;
-                    if (exp.length == 3) { // If it's just a simple assignment
-                        rez = EvalUtil.convNumeric(exp[2]);
-                        if (rez != null) { // Checking if we are assigning a variable only a value
-                            table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
-                            return (AssignStmt) stmt;
-                        } else { // If it's not a value, than it is the value of another variable
-                            rez = ((SymInteger) EvalUtil.lookUp(table, exp[2])).getValue();
-                            if (rez == null) {
-                                throw new SymbolException("Variable is not declared.");
-                            }
-                            table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
-                            return (AssignStmt) stmt;
-                        }
-                    } else { // If it's a compund assingment
-                        // First value of the assignment
-                        rez = EvalUtil.convNumeric(exp[2]);
-                        if (rez == null)
-                            rez = ((SymInteger) EvalUtil.lookUp(table, exp[2])).getValue();
-                        if (rez == null) {
-                            throw new SymbolException("Variable is not declared.");
-                        }
-                        // Rest of the values
-                        for (int i = 3; i < exp.length - 1; i = i + 2) {
-                            ISymbol s2 = EvalUtil.lookUp(table, exp[i + 1]);
-                            if (s2 != null) {
-                                rez += EvalUtil.evalArithemtic(new SymInteger(0, ""), s2, exp[i]);
-                            } else {
-                                Integer perm = EvalUtil.convNumeric(exp[i + 1]);
-                                if (perm == null) {
-                                    throw new SymbolException("Variable is not declared.");
-                                }
-                                Integer aux = 0;
-                                if (exp[i].startsWith("+")) {
-                                    aux = EvalUtil.evalArithemtic(new SymInteger(0, ""),
-                                            new SymInteger(perm, ""), exp[i]);
-                                    if (exp[i + 2].startsWith("*") || exp[i + 2].startsWith("/")) {
-                                        Integer aux2 = EvalUtil.convNumeric(exp[i + 1]);
-                                        aux += EvalUtil.evalArithemtic(new SymInteger(aux2, ""),
-                                                new SymInteger(EvalUtil.convNumeric(exp[i + 3]), ""), exp[i + 2]);
-                                        i += 2;
-                                    }
-                                }
-                                rez += aux;
-                            }
-                        }
-                        table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
-                        return (AssignStmt) stmt;
-
+                    Integer rez = EvalUtil.convNumeric(exp[2]);
+                    if (rez == null) {
+                        rez = ((SymInteger) EvalUtil.lookUp(table, exp[2])).getValue();
                     }
+                    int i = 3;
+                    while (i < exp.length - 1) {
+                        if (exp[i].startsWith("+") || exp[i].startsWith("-")) {
+                            int j = i + 2;
+                            Integer next = EvalUtil.convNumeric(exp[j - 1]);
+                            if (next == null) {
+                                next = ((SymInteger) EvalUtil.lookUp(table, exp[j - 1])).getValue();
+                            }
+                            while (j < exp.length - 1 || exp[j].startsWith("*") || exp[j].startsWith("/")) {
+                                Integer next2 = EvalUtil.convNumeric(exp[j + 1]);
+                                if (next2 == null) {
+                                    next2 = ((SymInteger) EvalUtil.lookUp(table, exp[j + 1])).getValue();
+                                }
+                                next = EvalUtil.evalArithemtic(new SymInteger(next, ""), new SymInteger(next2, ""),
+                                        exp[j]);
+                                rez += next;
+                                j += 2;
+                            }
+                            i = j;
+                        } else {
+                            i += 2;
+                        }
+                    }
+                    table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
+                    return (AssignStmt) stmt;
+
                 }
+
                 // Analog for the String value
                 if (EvalUtil.isString(sym)) {
                     if (exp.length == 3) {

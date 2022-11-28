@@ -52,3 +52,52 @@ IStmt comp = this.stack.removeLast();
         //     }
         // }
         
+
+
+
+if (exp.length == 3) { // If it's just a simple assignment
+                    rez = EvalUtil.convNumeric(exp[2]);
+                        if (rez != null) { // Checking if we are assigning a variable only a value
+                            table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
+                            return (AssignStmt) stmt;
+                        } else { // If it's not a value, than it is the value of another variable
+                            rez = ((SymInteger) EvalUtil.lookUp(table, exp[2])).getValue();
+                            if (rez == null) {
+                                throw new SymbolException("Variable is not declared.");
+                            }
+                            table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
+                            return (AssignStmt) stmt;
+                        }
+                    } else { // If it's a compund assingment
+                        // First value of the assignment
+                        rez = EvalUtil.convNumeric(exp[2]);
+                        if (rez == null)
+                            rez = ((SymInteger) EvalUtil.lookUp(table, exp[2])).getValue();
+                        if (rez == null) {
+                            throw new SymbolException("Variable is not declared.");
+                        }
+                        // Rest of the values
+                        for (int i = 3; i < exp.length - 1; i = i + 2) {
+                            ISymbol s2 = EvalUtil.lookUp(table, exp[i + 1]);
+                            if (s2 != null) {
+                                rez += EvalUtil.evalArithemtic(new SymInteger(0, ""), s2, exp[i]);
+                            } else {
+                                Integer perm = EvalUtil.convNumeric(exp[i + 1]);
+                                if (perm == null) {
+                                    throw new SymbolException("Variable is not declared.");
+                                }
+                                Integer aux = 0;
+                                if (exp[i].startsWith("+")) {
+                                    aux = EvalUtil.evalArithemtic(new SymInteger(0, ""),
+                                            new SymInteger(perm, ""), exp[i]);
+                                    if (exp[i + 2].startsWith("*") || exp[i + 2].startsWith("/")) {
+                                        Integer aux2 = EvalUtil.convNumeric(exp[i + 1]);
+                                        aux += EvalUtil.evalArithemtic(new SymInteger(aux2, ""),
+                                                new SymInteger(EvalUtil.convNumeric(exp[i + 3]), ""), exp[i + 2]);
+                                        i += 2;
+                                    }
+                                }
+                                rez += aux;
+                            }
+                        }
+                        table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
