@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Objects;
 
 import controller.exestack.ExeStack;
 import controller.exestack.MyDeque;
@@ -93,7 +94,12 @@ public class EvalUtil {
     }
 
     public static boolean isAssignStmt(IStmt statement) {
-        String tok = ((AssignStmt) statement).getWords()[1];
+        String tok = "";
+        if (((AssignStmt) statement).getWords().length > 1) {
+            tok = ((AssignStmt) statement).getWords()[1];
+        } else {
+            tok = ((AssignStmt) statement).getWords()[0];
+        }
         return tok.startsWith("=");
     }
 
@@ -203,6 +209,7 @@ public class EvalUtil {
     }
 
     // Processing the next step
+
     /**
      * @param table
      * @param stmt
@@ -214,6 +221,7 @@ public class EvalUtil {
      */
     public static AssignStmt processAssign(SymTable<String, ISymbol> table, IStmt stmt)
             throws TypeException, SymbolException, DivisionByZero {
+        // Integer nextFinal;
         if (EvalUtil.isAssignStmt(stmt)) { // First we check if it's an assign statement
             try {
                 String[] exp = ((AssignStmt) stmt).getWords();
@@ -222,37 +230,78 @@ public class EvalUtil {
                 if (sym == null) {
                     throw new SymbolException("Variable is not declared.");
                 }
+                Integer rez1 = 0;
                 if (EvalUtil.isInt(sym)) { // If our symbol is an integer
-                    Integer rez = EvalUtil.convNumeric(exp[2]);
-                    if (rez == null) {
-                        rez = ((SymInteger) EvalUtil.lookUp(table, exp[2])).getValue();
-                    }
                     int i = 3;
-                    while (i < exp.length - 1) {
-                        if (exp[i].startsWith("+") || exp[i].startsWith("-")) {
-                            int j = i + 2;
-                            Integer next = EvalUtil.convNumeric(exp[j - 1]);
-                            if (next == null) {
-                                next = ((SymInteger) EvalUtil.lookUp(table, exp[j - 1])).getValue();
-                            }
-                            while (j < exp.length - 1 || exp[j].startsWith("*") || exp[j].startsWith("/")) {
-                                Integer next2 = EvalUtil.convNumeric(exp[j + 1]);
-                                if (next2 == null) {
-                                    next2 = ((SymInteger) EvalUtil.lookUp(table, exp[j + 1])).getValue();
+                    Integer rez = 0;
+                    if (i < exp.length - 1) {
+                        boolean added = false;
+                        while (i < exp.length - 1) {
+                            if (exp[i].startsWith("*") || exp[i].startsWith("/")) {
+                                Integer next = getNextInteger(table, exp, i);
+                                rez1 = next;
+                                int parseInt = i - 1;
+                                exp[i - 1] = String.valueOf(next);
+                                String[] arr_new = new String[exp.length - 1];
+                                for (int count = 0, k = 0; count < exp.length; count++) {
+                                    if (count != parseInt + 1) {
+                                        arr_new[k] = exp[count];
+                                        k++;
+                                    }
                                 }
-                                next = EvalUtil.evalArithemtic(new SymInteger(next, ""), new SymInteger(next2, ""),
-                                        exp[j]);
-                                rez += next;
-                                j += 2;
+                                String[] arr_new1 = new String[arr_new.length - 1];
+                                for (int count = 0, k = 0; count < arr_new.length; count++) {
+                                    if (count != parseInt + 1) {
+                                        arr_new1[k] = arr_new[count];
+                                        k++;
+                                    }
+                                }
+                                exp = arr_new1;
+
                             }
-                            i = j;
-                        } else {
                             i += 2;
                         }
+                        rez = rez1;
+                        i = 3;
+                        if (i + 3 < exp.length && !Objects.equals(exp[i + 3], "else")) {
+                            while (i < exp.length - 1) {
+                                Integer next = getNextInteger(table, exp, i);
+
+                                if (i + 1 <= exp.length) {
+                                    exp[i + 1] = String.valueOf(next);
+                                    rez = next;
+                                } else {
+                                    rez += next;
+                                }
+
+                                i += 2;
+                            }
+                            added = true;
+                        }
+                        i = 3;
+                        if (i < exp.length && !added) {
+                            while (i < exp.length - 1) {
+                                Integer next = getNextInteger(table, exp, i);
+
+                                if (i + 1 <= exp.length) {
+                                    exp[i + 1] = String.valueOf(next);
+                                    rez = next;
+                                } else {
+                                    rez += next;
+                                }
+
+                                i += 2;
+                            }
+                        }
+                    } else {
+                        Integer next = EvalUtil.convNumeric(exp[2]);
+                        if (next == null) {
+                            next = ((SymInteger) EvalUtil.lookUp(table, exp[2])).getValue();
+                        }
+                        rez = next;
                     }
                     table.setSymbol(sym.getLabel(), new SymInteger(rez, sym.getLabel()));
                     return (AssignStmt) stmt;
-
                 }
 
                 // Analog for the String value
@@ -318,6 +367,21 @@ public class EvalUtil {
         }
         return (AssignStmt) null;
 
+    }
+
+    private static Integer getNextInteger(SymTable<String, ISymbol> table, String[] exp, int i)
+            throws DivisionByZero, TypeException {
+        Integer next = EvalUtil.convNumeric(exp[i - 1]);
+        if (next == null) {
+            next = ((SymInteger) EvalUtil.lookUp(table, exp[i - 1])).getValue();
+        }
+        Integer next2 = EvalUtil.convNumeric(exp[i + 1]);
+        if (next2 == null) {
+            next2 = ((SymInteger) EvalUtil.lookUp(table, exp[i + 1])).getValue();
+        }
+        next = EvalUtil.evalArithemtic(new SymInteger(next, ""), new SymInteger(next2, ""),
+                exp[i]);
+        return next;
     }
 
     public static VarDecl processDecl(SymTable<String, ISymbol> table, IStmt v) throws SymbolException {
@@ -402,7 +466,21 @@ public class EvalUtil {
                 stack.addFirst(checkAssign);
         }
         if (exp.length == 4) {
-            return (IfStmt) conditional;
+            // Now we do the else branch
+            AssignStmt checkAssign = new AssignStmt(exp[3]);
+            checkAssign = EvalUtil.processAssign(table, checkAssign);
+            if (checkAssign == null) { // If it's not one, the it's the other
+                PrintStmt checkPrint = new PrintStmt(exp[3]);
+                checkPrint = EvalUtil.processPrint(output, table, checkPrint);
+                if (checkPrint == null) {
+                    throw new StmtException("Instruction cannot be done");
+                }
+                stack.addFirst(checkPrint);
+                return (IfStmt) conditional;
+            } else {
+                stack.addFirst(checkAssign);
+                return (IfStmt) conditional;
+            }
         } else {
             // Now we do the else branch
             AssignStmt checkAssign = new AssignStmt(exp[5]);
@@ -440,7 +518,7 @@ public class EvalUtil {
                         return EvalUtil.conditionalHelper(cond, exp, conditional, stack, table, output);
                     }
                     if (sym.getType() == "Bool" || b != null) {
-                        Boolean cond = ((SymBoolean) sym).getValue() != false || b != false;
+                        Boolean cond = ((SymBoolean) sym).getValue() || b;
                         return EvalUtil.conditionalHelper(cond, exp, conditional, stack, table, output);
                     }
                 }
@@ -535,6 +613,7 @@ public class EvalUtil {
                 if (filenameVar != null) {
                     BufferedReader file = filetable.get((SymString) filenameVar);
                     file.close();
+                    filetable.remove((SymString) filenameVar);
                     return (CloseRFile) read;
                 }
             } catch (IOException io) {

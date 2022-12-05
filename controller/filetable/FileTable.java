@@ -26,6 +26,16 @@ public class FileTable<Str, Reader> implements IFileTable<Str, Reader> {
     }
 
     @Override
+    public void remove(Str filename) {
+        for (Str k : this.filetable.keySet()) {
+            if (k.equals(filename)) {
+                this.filetable.remove(k);
+                break;
+            }
+        }
+    }
+
+    @Override
     public String toString() {
         String rez = "";
         if (filetable.size() == 0) {
@@ -36,4 +46,5 @@ public class FileTable<Str, Reader> implements IFileTable<Str, Reader> {
         }
         return rez;
     }
+
 }

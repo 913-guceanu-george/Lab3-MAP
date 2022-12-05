@@ -98,6 +98,7 @@ public class View implements IView {
                     System.exit(0);
                 }
                 // Reading from file case
+
                 this.progState.nextIsRead();
                 last = this.progState.getStack().getLast();
                 if (last.getType() == "NOP") {

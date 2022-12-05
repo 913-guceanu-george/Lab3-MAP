@@ -8,4 +8,6 @@ public interface IFileTable<Str, Reader> {
     public Reader get(Str filename);
 
     public HashMap<Str, Reader> getAll();
+
+    public void remove(Str filename);
 }
